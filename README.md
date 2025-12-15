@@ -31,7 +31,7 @@ price is frothin 9.99
 
 ```slang
 prep greet barbie
-  crikey – "gday"
+  Crikey! "gday"
   fair go yeah
 
 greet
@@ -45,11 +45,12 @@ greet
 ### Output
 
 ```slang
-crikey – "gday mate"
-crikey – name
+Crikey! "gday mate"
+Crikey! name
 ```
 
-- `crikey – <expr>` — print to stdout
+- `Crikey! <expr>` — print to stdout
+- Keywords are case-insensitive (`crikey!`, `Crikey!`, `CRIKEY!` all work)
 
 ### Primitives
 

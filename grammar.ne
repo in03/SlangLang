@@ -12,10 +12,15 @@ function joinIdent(parts) {
 
 program -> topstatements {% id %}
 
-# Top-level statements can be separated by newlines
+# Top-level statements can be separated by newlines or terminated by periods
+# Period acts like JavaScript semicolon - optional with indentation/newlines, required otherwise
+stmtend -> %NL {% id %}
+        | %DOT {% id %}
+        | %DOT %NL {% id %}
+
 topstatements -> statement {% d => [d[0]] %}
-              | topstatements %NL statement {% d => [...d[0], d[2]] %}
-              | topstatements %NL {% d => d[0] %}
+              | topstatements stmtend statement {% d => [...d[0], d[2]] %}
+              | topstatements stmtend {% d => d[0] %}
 
 statement -> printstmt {% id %}
            | funcdef {% id %}
@@ -57,7 +62,8 @@ multiident -> identword {% d => [d[0]] %}
            | multiident identword {% d => [...d[0], d[1]] %}
 
 # ============ PRINT ============
-printstmt -> %KW_CRIKEY %DASH expr {% 
+# crikey! <expr> - print statement (! required after crikey)
+printstmt -> %KW_CRIKEY %BANG expr {% 
   d => ({ type: "Print", expr: d[2] }) 
 %}
 
@@ -91,10 +97,11 @@ returnstmt -> %KW_DEAL expr {%
 expr -> compareexpr {% id %}
 
 compareexpr -> addexpr {% id %}
-            | addexpr %KW_BIGGERTHAN addexpr {% d => ({ type: "BinOp", op: ">", left: d[0], right: d[2] }) %}
-            | addexpr %KW_SMALLERTHAN addexpr {% d => ({ type: "BinOp", op: "<", left: d[0], right: d[2] }) %}
+            | addexpr %KW_TOPS addexpr {% d => ({ type: "BinOp", op: ">", left: d[0], right: d[2] }) %}
+            | addexpr %KW_COPS addexpr {% d => ({ type: "BinOp", op: "<", left: d[0], right: d[2] }) %}
             | addexpr %KW_EQUALS addexpr {% d => ({ type: "BinOp", op: "===", left: d[0], right: d[2] }) %}
             | addexpr %KW_NOT %KW_EQUALS addexpr {% d => ({ type: "BinOp", op: "!==", left: d[0], right: d[3] }) %}
+            | addexpr %KW_ISNT addexpr {% d => ({ type: "BinOp", op: "!==", left: d[0], right: d[2] }) %}
             | addexpr %KW_IS %KW_NOT addexpr {% d => ({ type: "BinOp", op: "!==", left: d[0], right: d[3] }) %}
             | addexpr %KW_IS addexpr {% d => ({ type: "BinOp", op: "===", left: d[0], right: d[2] }) %}
 
@@ -387,4 +394,5 @@ gimmestmt -> %KW_GIMME multiident %DOT {%
 block -> %INDENT statements %DEDENT {% d => d[1] %}
 
 statements -> statement {% d => [d[0]] %}
-           | statements %NL statement {% d => [...d[0], d[2]] %}
+           | statements stmtend statement {% d => [...d[0], d[2]] %}
+           | statements stmtend {% d => d[0] %}

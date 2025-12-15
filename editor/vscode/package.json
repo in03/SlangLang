@@ -1,0 +1,35 @@
+{
+  "name": "slanglang",
+  "displayName": "SlangLang",
+  "description": "Syntax highlighting for SlangLang - Australian slang programming language",
+  "version": "0.2.0",
+  "publisher": "slanglang",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "slang",
+        "aliases": [
+          "SlangLang",
+          "slang"
+        ],
+        "extensions": [
+          ".slang"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "slang",
+        "scopeName": "source.slang",
+        "path": "./syntaxes/slanglang.tmLanguage.json"
+      }
+    ]
+  }
+}

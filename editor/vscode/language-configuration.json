@@ -1,0 +1,60 @@
+{
+  "comments": {
+    "lineComment": "#"
+  },
+  "brackets": [
+    [
+      "(",
+      ")"
+    ],
+    [
+      "[",
+      "]"
+    ],
+    [
+      "{",
+      "}"
+    ]
+  ],
+  "autoClosingPairs": [
+    {
+      "open": "\"",
+      "close": "\""
+    },
+    {
+      "open": "(",
+      "close": ")"
+    },
+    {
+      "open": "[",
+      "close": "]"
+    },
+    {
+      "open": "{",
+      "close": "}"
+    }
+  ],
+  "surroundingPairs": [
+    [
+      "\"",
+      "\""
+    ],
+    [
+      "(",
+      ")"
+    ],
+    [
+      "[",
+      "]"
+    ],
+    [
+      "{",
+      "}"
+    ]
+  ],
+  "indentationRules": {
+    "increaseIndentPattern": "^.*(barbie|!|:)\\s*$",
+    "decreaseIndentPattern": "^\\s*(who's full\\?|who's got it\\?|fully sick\\.|make tracks\\.|otherwise,).*$"
+  },
+  "wordPattern": "[a-zA-Z_][a-zA-Z0-9_]*"
+}

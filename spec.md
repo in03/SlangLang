@@ -80,13 +80,25 @@ No intermediate files are written by default.
 * Spaces only (tabs discouraged)
 * INDENT and DEDENT tokens are synthesized based on leading whitespace after newlines
 
+### Case Insensitivity
+
+All SlangLang keywords are **case-insensitive**. This allows for more natural, sentence-like code:
+
+```slang
+Crikey! "Hello"      // Capitalized at start of line
+crikey! "hello"      // lowercase works too
+If score biggerthan 90,
+  Crikey! "Ripper!"
+Make tracks.
+```
+
 ### Multi-Word Identifiers
 
 SlangLang supports **multi-word variable names** that feel natural and conversational. Keywords and punctuation act as boundaries:
 
 ```slang
 scoffin the tasty morsel from sangas!
-  crikey – the_tasty_morsel
+  Crikey! the_tasty_morsel
 who's full?
 ```
 
@@ -105,7 +117,7 @@ Boundary markers include:
 | `barbie`        | Function body start marker     |
 | `with`          | Parameter list start           |
 | `and`           | Parameter/argument separator   |
-| `crikey`        | Print keyword                  |
+| `crikey`        | Print keyword (use with `!`)   |
 | `fair` `go`     | Return keyword pair            |
 | `deal`          | Return keyword (alternative)   |
 | `yeah`          | Boolean true                   |
@@ -120,7 +132,7 @@ Boundary markers include:
 | `esky`          | List literal keyword           |
 | `tuckshop`      | Dictionary literal keyword     |
 | `empty`         | Empty list/null value          |
-| `–` (en dash)   | Print separator                |
+| `!`             | Print separator (after crikey) |
 | STRING          | Double‑quoted string           |
 | NUMBER          | Numeric literal (int or float) |
 | IDENT           | Identifier                     |
@@ -356,13 +368,14 @@ price is frothin 9.99
 ### Print Statement
 
 ```slang
-crikey – "gday"
-crikey – name
-crikey – x plus y
+Crikey! "gday"
+Crikey! name
+Crikey! x plus y
 ```
 
 * Outputs to stdout
 * Compiles to `console.log`
+* Keywords are case-insensitive (`crikey!`, `Crikey!`, `CRIKEY!` all work)
 
 ### Return Statement
 
@@ -384,7 +397,7 @@ deal result
 
 ```slang
 prep greet barbie
-  crikey – "gday"
+  Crikey! "gday"
   fair go yeah
 ```
 
@@ -392,7 +405,7 @@ prep greet barbie
 
 ```slang
 prep greet barbie with name
-  crikey – name
+  Crikey! name
   deal yeah
 
 prep add barbie with a and b
@@ -463,13 +476,13 @@ let menu = { pies: 5, sauce: "tomato", roll: 3 };
 Access list elements by index:
 
 ```slang
-crikey – grab 0 from goodies
+Crikey! grab 0 from goodies
 ```
 
 Access dictionary values by key:
 
 ```slang
-crikey – grab pies from menu
+Crikey! grab pies from menu
 ```
 
 ### List Operations
@@ -521,7 +534,7 @@ snacks is sheepshear goodies from 1 in 3
 Access single element:
 
 ```slang
-crikey – goodies sheepshear 0
+Crikey! goodies sheepshear 0
 ```
 
 ---
@@ -536,7 +549,7 @@ Iterate over list items:
 
 ```slang
 scoffin snag from sangas!
-  crikey – snag
+  Crikey! snag
 who's full?
 ```
 
@@ -548,8 +561,8 @@ Iterate over dictionary entries with built-in `item` (key) and `price` (value) v
 
 ```slang
 dealin from menu!
-  crikey – item
-  crikey – price
+  Crikey! item
+  Crikey! price
 who's full?
 ```
 
@@ -559,7 +572,7 @@ Loop a specified number of times:
 
 ```slang
 pass the counter, flamin five!
-  crikey – counter
+  Crikey! counter
 who's got it?
 ```
 
@@ -569,7 +582,7 @@ Note: `flamin five` = 4 iterations (length of "five").
 
 ```slang
 every num in flamin three:
-  crikey – num
+  Crikey! num
 ```
 
 Note: `flamin three` = 5 iterations (length of "three").
@@ -580,7 +593,7 @@ Loop while condition is falsy:
 
 ```slang
 til bag is empty.
-  crikey – "still goin"
+  Crikey! "still goin"
 fully sick.
 ```
 
@@ -596,7 +609,7 @@ fully sick.
 
 ```slang
 if age biggerthan 18,
-  crikey – "You're an adult"
+  Crikey! "You're an adult"
 make tracks.
 ```
 
@@ -604,11 +617,11 @@ With else-if and else:
 
 ```slang
 if score biggerthan 90,
-  crikey – "Ripper!"
+  Crikey! "Ripper!"
 or if score biggerthan 50,
-  crikey – "Not bad"
+  Crikey! "Not bad"
 otherwise,
-  crikey – "Better luck next time"
+  Crikey! "Better luck next time"
 make tracks.
 ```
 

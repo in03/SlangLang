@@ -13,7 +13,7 @@ const source = fs.readFileSync(inputFile, "utf8");
 const sourceLines = source.split(/\r?\n/);
 
 function formatError(err, source) {
-  console.error("\n\x1b[31m✗ Parse Error\x1b[0m\n");
+  console.error("\n\x1b[31m✗ Strewth! Parse Error\x1b[0m\n");
   
   // Try to extract line/column info from nearley error (different formats)
   let line = null, col = null;

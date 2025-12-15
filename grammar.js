@@ -14,9 +14,12 @@ var grammar = {
     Lexer: lexer,
     ParserRules: [
     {"name": "program", "symbols": ["topstatements"], "postprocess": id},
+    {"name": "stmtend", "symbols": [(lexer.has("NL") ? {type: "NL"} : NL)], "postprocess": id},
+    {"name": "stmtend", "symbols": [(lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": id},
+    {"name": "stmtend", "symbols": [(lexer.has("DOT") ? {type: "DOT"} : DOT), (lexer.has("NL") ? {type: "NL"} : NL)], "postprocess": id},
     {"name": "topstatements", "symbols": ["statement"], "postprocess": d => [d[0]]},
-    {"name": "topstatements", "symbols": ["topstatements", (lexer.has("NL") ? {type: "NL"} : NL), "statement"], "postprocess": d => [...d[0], d[2]]},
-    {"name": "topstatements", "symbols": ["topstatements", (lexer.has("NL") ? {type: "NL"} : NL)], "postprocess": d => d[0]},
+    {"name": "topstatements", "symbols": ["topstatements", "stmtend", "statement"], "postprocess": d => [...d[0], d[2]]},
+    {"name": "topstatements", "symbols": ["topstatements", "stmtend"], "postprocess": d => d[0]},
     {"name": "statement", "symbols": ["printstmt"], "postprocess": id},
     {"name": "statement", "symbols": ["funcdef"], "postprocess": id},
     {"name": "statement", "symbols": ["returnstmt"], "postprocess": id},
@@ -49,7 +52,7 @@ var grammar = {
     {"name": "identword", "symbols": [(lexer.has("KW_LOT") ? {type: "KW_LOT"} : KW_LOT)], "postprocess": d => "lot"},
     {"name": "multiident", "symbols": ["identword"], "postprocess": d => [d[0]]},
     {"name": "multiident", "symbols": ["multiident", "identword"], "postprocess": d => [...d[0], d[1]]},
-    {"name": "printstmt", "symbols": [(lexer.has("KW_CRIKEY") ? {type: "KW_CRIKEY"} : KW_CRIKEY), (lexer.has("DASH") ? {type: "DASH"} : DASH), "expr"], "postprocess":  
+    {"name": "printstmt", "symbols": [(lexer.has("KW_CRIKEY") ? {type: "KW_CRIKEY"} : KW_CRIKEY), (lexer.has("BANG") ? {type: "BANG"} : BANG), "expr"], "postprocess":  
         d => ({ type: "Print", expr: d[2] }) 
         },
     {"name": "funcdef", "symbols": [(lexer.has("KW_PREP") ? {type: "KW_PREP"} : KW_PREP), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), "block"], "postprocess":  
@@ -68,10 +71,11 @@ var grammar = {
         },
     {"name": "expr", "symbols": ["compareexpr"], "postprocess": id},
     {"name": "compareexpr", "symbols": ["addexpr"], "postprocess": id},
-    {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_BIGGERTHAN") ? {type: "KW_BIGGERTHAN"} : KW_BIGGERTHAN), "addexpr"], "postprocess": d => ({ type: "BinOp", op: ">", left: d[0], right: d[2] })},
-    {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_SMALLERTHAN") ? {type: "KW_SMALLERTHAN"} : KW_SMALLERTHAN), "addexpr"], "postprocess": d => ({ type: "BinOp", op: "<", left: d[0], right: d[2] })},
+    {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_TOPS") ? {type: "KW_TOPS"} : KW_TOPS), "addexpr"], "postprocess": d => ({ type: "BinOp", op: ">", left: d[0], right: d[2] })},
+    {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_COPS") ? {type: "KW_COPS"} : KW_COPS), "addexpr"], "postprocess": d => ({ type: "BinOp", op: "<", left: d[0], right: d[2] })},
     {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_EQUALS") ? {type: "KW_EQUALS"} : KW_EQUALS), "addexpr"], "postprocess": d => ({ type: "BinOp", op: "===", left: d[0], right: d[2] })},
     {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_NOT") ? {type: "KW_NOT"} : KW_NOT), (lexer.has("KW_EQUALS") ? {type: "KW_EQUALS"} : KW_EQUALS), "addexpr"], "postprocess": d => ({ type: "BinOp", op: "!==", left: d[0], right: d[3] })},
+    {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_ISNT") ? {type: "KW_ISNT"} : KW_ISNT), "addexpr"], "postprocess": d => ({ type: "BinOp", op: "!==", left: d[0], right: d[2] })},
     {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_NOT") ? {type: "KW_NOT"} : KW_NOT), "addexpr"], "postprocess": d => ({ type: "BinOp", op: "!==", left: d[0], right: d[3] })},
     {"name": "compareexpr", "symbols": ["addexpr", (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), "addexpr"], "postprocess": d => ({ type: "BinOp", op: "===", left: d[0], right: d[2] })},
     {"name": "addexpr", "symbols": ["mulexpr"], "postprocess": id},
@@ -245,7 +249,8 @@ var grammar = {
         },
     {"name": "block", "symbols": [(lexer.has("INDENT") ? {type: "INDENT"} : INDENT), "statements", (lexer.has("DEDENT") ? {type: "DEDENT"} : DEDENT)], "postprocess": d => d[1]},
     {"name": "statements", "symbols": ["statement"], "postprocess": d => [d[0]]},
-    {"name": "statements", "symbols": ["statements", (lexer.has("NL") ? {type: "NL"} : NL), "statement"], "postprocess": d => [...d[0], d[2]]}
+    {"name": "statements", "symbols": ["statements", "stmtend", "statement"], "postprocess": d => [...d[0], d[2]]},
+    {"name": "statements", "symbols": ["statements", "stmtend"], "postprocess": d => d[0]}
 ]
   , ParserStart: "program"
 }

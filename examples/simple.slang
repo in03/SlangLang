@@ -1,11 +1,11 @@
-crikey – "Testing basic features"
+Crikey! "Testing basic features"
 
 name is bloody Bruce mate
-crikey – name
+Crikey! name
 
 count is 42
-crikey – count
+Crikey! count
 
 length is flamin ripper
-crikey – length
+Crikey! length
 

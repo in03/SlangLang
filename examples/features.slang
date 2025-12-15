@@ -1,71 +1,74 @@
-crikey – "=== Testing SlangLang Features ==="
+Crikey! "=== Testing SlangLang Features ==="
 
-crikey – "--- Esky (List) ---"
+Crikey! "--- Esky (List) ---"
 sangas is esky: bloody ham, bloody cheese, bloody salad.
-crikey – sangas
+Crikey! sangas
 
-crikey – "--- Tuckshop (Dictionary) ---"
-menu is tuckshop: pies is 5, sauce is "tomato", roll is 3.
-crikey – menu
+Crikey! "--- Tuckshop (Dictionary) ---"
+menu is tuckshop: pies is 5, sauce is bloody tomato mate, roll is 3.
+Crikey! menu
 
-crikey – "--- Scoffin Loop (ForEach) ---"
+Crikey! "--- Scoffin Loop (ForEach) ---"
 scoffin snag from sangas!
-  crikey – snag
+  Crikey! snag
 who's full?
 
-crikey – "--- Dealin Loop (Dict Iteration) ---"
+Crikey! "--- Dealin Loop (Dict Iteration) ---"
 dealin from menu!
-  crikey – item
-  crikey – price
+  Crikey! item
+  Crikey! price
 who's full?
 
-crikey – "--- Pass The Parcel (Range Loop) ---"
+Crikey! "--- Pass The Parcel (Range Loop) ---"
 pass the parcel, flamin five!
-  crikey – parcel plus bloody chips mate
+  Crikey! parcel plus bloody chips mate
 who's got it?
 
-crikey – "--- Every Loop (Named Range) ---"
+Crikey! "--- Every Loop (Named Range) ---"
 every num in flamin duo:
-  crikey – num
+  Crikey! num
 
-crikey – "--- Conditionals ---"
+Crikey! "--- Conditionals ---"
 age is 25
-if age biggerthan 18,
-  crikey – "You're an adult mate"
+if age tops 18,
+  Crikey! "You're an adult mate"
 make tracks.
 
 score is 75
-if score biggerthan 90,
-  crikey – "Ripper!"
-or if score biggerthan 50,
-  crikey – "Not bad"
+if score tops 90,
+  Crikey! "Ripper!"
+or if score tops 50,
+  Crikey! "Not bad"
 otherwise,
-  crikey – "Better luck next time"
+  Crikey! "Better luck next time"
 make tracks.
 
-crikey – "--- Arithmetic ---"
+Crikey! "--- Arithmetic ---"
 x is 10
 y is 3
-crikey – x plus y
-crikey – x minus y
-crikey – x times y
-crikey – x dividedby y
+Crikey! x plus y
+Crikey! x minus y
+Crikey! x times y
+Crikey! x dividedby y
 
-crikey – "--- Comparisons ---"
-crikey – 5 biggerthan 3
-crikey – 2 smallerthan 10
-crikey – 5 equals 5
-crikey – 5 not equals 3
+Crikey! "--- Comparisons ---"
+Crikey! 5 tops 3
+Crikey! 2 cops 10
+Crikey! 5 is 5
+Crikey! 5 isn't 3
 
-crikey – "--- Functions with Parameters ---"
+Crikey! "--- Functions with Parameters ---"
 prep greet barbie with name
-  crikey – name
+  Crikey! name
   deal yeah
 
 flamin greet with "Bruce"
 
-crikey – "--- Grab (Index Access) ---"
-crikey – grab 0 from sangas
-crikey – grab pies from menu
+Crikey! grab 0 from sangas
+Crikey! grab bloody pies mate from menu
 
-crikey – "=== All Features Working! ==="
+Crikey! "=== All Features Working! ==="
+
+if flamin caleb isn't flamin working,
+  Crikey! Bloody what did I hire him for? Mate.
+make tracks.

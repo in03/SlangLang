@@ -1,28 +1,28 @@
-crikey – "Testing esky and scoffin loop"
+Crikey! "Testing esky and scoffin loop"
 
 sangas is esky: bloody ham, bloody cheese, bloody salad.
-crikey – sangas
+Crikey! sangas
 
 scoffin snag from sangas!
-  crikey – snag
+  Crikey! snag
 who's full?
 
-crikey – "Testing tuckshop and dealin loop"
+Crikey! "Testing tuckshop and dealin loop"
 menu is tuckshop: pies is 5, sauce is "tomato", roll is 3.
-crikey – menu
+Crikey! menu
 
 dealin from menu!
-  crikey – item
-  crikey – price
+  Crikey! item
+  Crikey! price
 who's full?
 
-crikey – "Testing pass the parcel"
+Crikey! "Testing pass the parcel"
 pass the counter, flamin five!
-  crikey – counter
+  Crikey! counter
 who's got it?
 
-crikey – "Testing every loop"
+Crikey! "Testing every loop"
 every num in flamin three:
-  crikey – num
+  Crikey! num
 
-crikey – "Done!"
+Crikey! "Done!"

@@ -1,5 +1,5 @@
 prep greet barbie
-  crikey – "gday"
+  Crikey! "gday"
   fair go yeah
 
 greet

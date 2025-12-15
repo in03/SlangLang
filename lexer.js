@@ -2,15 +2,14 @@ const moo = require("moo");
 
 // Keywords that act as boundaries for multi-word identifiers
 const BOUNDARY_KEYWORDS = new Set([
-  "prep", "barbie", "with", "crikey", "fair", "go", "deal", "is",
+  "prep", "barbie", "with", "crikey", "fair", "go", "deal", "is", "isn't",
   "bloody", "flamin", "frothin", "spewin", "mate",
   "esky", "tuckshop", "empty",
   "scoffin", "dealin", "from", "pass", "the",
   "til", "fully", "sick", "every", "in",
   "another", "shrimp", "ditch", "drop", "last", "first", "snag",
-  "sheepshear", "top", "up", "grab", "at",
-  "if", "or", "otherwise", "make", "tracks",
-  "biggerthan", "smallerthan", "equals", "not", "and",
+  "sheepshear", "tops", "cops", "up", "grab", "at",
+  "if", "or", "otherwise", "make", "tracks", "equals", "not", "and",
   "plus", "minus", "times", "dividedby",
   "chuck", "lot", "mates", "call", "it",
   "bugger", "suss", "gimme",
@@ -20,92 +19,105 @@ const BOUNDARY_KEYWORDS = new Set([
 // Punctuation that acts as boundaries
 const BOUNDARY_PUNCTUATION = new Set([":", ",", ".", "!", "?", "–"]);
 
+// Helper to create case-insensitive keyword regex for moo (no /i flag allowed)
+// Converts "word" to /[Ww][Oo][Rr][Dd]/
+function kw(word) {
+  const pattern = word.split('').map(c => {
+    if (/[a-z]/i.test(c)) {
+      return `[${c.toUpperCase()}${c.toLowerCase()}]`;
+    }
+    return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape special chars
+  }).join('');
+  return new RegExp(pattern);
+}
+
 function createLexer() {
   const lexer = moo.states({
     main: {
       WS: /[ \t]+/,
-      // Keywords - order matters for matching
-      KW_PREP: "prep",
-      KW_BARBIE: "barbie",
-      KW_WITH: "with",
-      KW_CRIKEY: "crikey",
-      DASH: "–",
-      KW_FAIR: "fair",
-      KW_IS: "is",
-      KW_BLOODY: "bloody",
-      KW_FLAMIN: "flamin",
-      KW_FROTHIN: "frothin",
-      KW_SPEWIN: "spewin",
-      KW_MATE: "mate",
+      // Keywords - order matters for matching (case-insensitive)
+      KW_PREP: kw("prep"),
+      KW_BARBIE: kw("barbie"),
+      KW_WITH: kw("with"),
+      KW_CRIKEY: kw("crikey"),
+      KW_FAIR: kw("fair"),
+      KW_ISNT: /[Ii][Ss][Nn][\u2019'][Tt]/,  // Support both apostrophe types, case-insensitive
+      KW_IS: kw("is"),
+      KW_BLOODY: kw("bloody"),
+      KW_FLAMIN: kw("flamin"),
+      KW_FROTHIN: kw("frothin"),
+      KW_SPEWIN: kw("spewin"),
+      KW_MATE: kw("mate"),
       
       // Data structure keywords
-      KW_ESKY: "esky",
-      KW_TUCKSHOP: "tuckshop",
-      KW_EMPTY: "empty",
+      KW_ESKY: kw("esky"),
+      KW_TUCKSHOP: kw("tuckshop"),
+      KW_EMPTY: kw("empty"),
       
       // Loop keywords
-      KW_SCOFFIN: "scoffin",
-      KW_DEALIN: "dealin",
-      KW_DEAL: "deal",
-      KW_THE: "the",
-      KW_FROM: "from",
-      KW_PASS: "pass",
-      KW_TIL: "til",
-      KW_FULLY: "fully",
-      KW_SICK: "sick",
-      KW_WHOS: "who's",
-      KW_FULL: "full",
-      KW_GOT: "got",
-      KW_GO: "go",
-      KW_EVERY: "every",
-      KW_IN: "in",
+      KW_SCOFFIN: kw("scoffin"),
+      KW_DEALIN: kw("dealin"),
+      KW_DEAL: kw("deal"),
+      KW_THE: kw("the"),
+      KW_FROM: kw("from"),
+      KW_PASS: kw("pass"),
+      KW_TIL: kw("til"),
+      KW_FULLY: kw("fully"),
+      KW_SICK: kw("sick"),
+      KW_WHOS: /[Ww][Hh][Oo][\u2019'][Ss]/,  // Support both apostrophe types, case-insensitive
+      KW_FULL: kw("full"),
+      KW_GOT: kw("got"),
+      KW_GO: kw("go"),
+      KW_EVERY: kw("every"),
+      KW_IN: kw("in"),
       
       // List operations
-      KW_ANOTHER: "another",
-      KW_SHRIMP: "shrimp",
-      KW_DITCH: "ditch",
-      KW_DROP: "drop",
-      KW_LAST: "last",
-      KW_FIRST: "first",
-      KW_SNAG: "snag",
-      KW_SHEEPSHEAR: "sheepshear",
-      KW_TOP: "top",
-      KW_UP: "up",
-      KW_GRAB: "grab",
-      KW_AT: "at",
+      KW_ANOTHER: kw("another"),
+      KW_SHRIMP: kw("shrimp"),
+      KW_DITCH: kw("ditch"),
+      KW_DROP: kw("drop"),
+      KW_LAST: kw("last"),
+      KW_FIRST: kw("first"),
+      KW_SNAG: kw("snag"),
+      KW_SHEEPSHEAR: kw("sheepshear"),
+      KW_TOPS: kw("tops"),
+      KW_COPS: kw("cops"),
+      KW_UP: kw("up"),
+      KW_GRAB: kw("grab"),
+      KW_AT: kw("at"),
       
       // Conditionals
-      KW_IF: "if",
-      KW_OR: "or",
-      KW_OTHERWISE: "otherwise",
-      KW_MAKE: "make",
-      KW_TRACKS: "tracks",
+      KW_IF: kw("if"),
+      KW_OR: kw("or"),
+      KW_OTHERWISE: kw("otherwise"),
+      KW_MAKE: kw("make"),
+      KW_TRACKS: kw("tracks"),
       
       // Comparison operators
-      KW_BIGGERTHAN: "biggerthan",
-      KW_SMALLERTHAN: "smallerthan",
-      KW_EQUALS: "equals",
-      KW_NOT: "not",
-      KW_AND: "and",
+      KW_BIGGERTHAN: kw("biggerthan"),
+      KW_SMALLERTHAN: kw("smallerthan"),
+      KW_EQUALS: kw("equals"),
+      KW_NOT: kw("not"),
+      KW_AND: kw("and"),
       
       // Arithmetic operators
-      KW_PLUS: "plus",
-      KW_MINUS: "minus",
-      KW_TIMES: "times",
-      KW_DIVIDEDBY: "dividedby",
+      KW_PLUS: kw("plus"),
+      KW_MINUS: kw("minus"),
+      KW_TIMES: kw("times"),
+      KW_DIVIDEDBY: kw("dividedby"),
       
       // Import keywords
-      KW_CHUCK: "chuck",
-      KW_LOT: "lot",
-      KW_MATES: "mates",
-      KW_CALL: "call",
+      KW_CHUCK: kw("chuck"),
+      KW_LOT: kw("lot"),
+      KW_MATES: kw("mates"),
+      KW_CALL: kw("call"),
       
       // Exception/assertion
-      KW_BUGGER: "bugger",
-      KW_SUSS: "suss",
+      KW_BUGGER: kw("bugger"),
+      KW_SUSS: kw("suss"),
       
       // IO
-      KW_GIMME: "gimme",
+      KW_GIMME: kw("gimme"),
       
       // Punctuation
       COLON: ":",
@@ -113,9 +125,10 @@ function createLexer() {
       DOT: ".",
       BANG: "!",
       QUESTION: "?",
+      DASH: "–",  // Keep for backwards compatibility with imports etc.
       
-      BOOL: /yeah|nah/,
-      NULL: "nothin",
+      BOOL: /[Yy][Ee][Aa][Hh]|[Nn][Aa][Hh]/,
+      NULL: kw("nothin"),
       NUMBER: /-?[0-9]+(?:\.[0-9]+)?/,
       STRING: /"(?:[^"\\]|\\.)*"/,
       IDENT: /[a-zA-Z_][a-zA-Z0-9_]*/,
