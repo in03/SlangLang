@@ -411,6 +411,132 @@
       font-size: 0.75rem;
       color: var(--text-dim);
     }
+
+    /* Quick Reference Panel */
+    .quickref {
+      margin-top: 1.5rem;
+      border: 2px solid var(--border);
+    }
+
+    .quickref-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .quickref-header:hover {
+      background: var(--surface);
+    }
+
+    .quickref-title {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .quickref-toggle {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+
+    .quickref-content {
+      display: none;
+      background: var(--surface);
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .quickref.open .quickref-content {
+      display: block;
+    }
+
+    .quickref.open .quickref-toggle::after {
+      content: '▲';
+    }
+
+    .quickref-toggle::after {
+      content: '▼';
+    }
+
+    .quickref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 0;
+    }
+
+    .quickref-section {
+      padding: 0.75rem 1rem;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .quickref-section:last-child {
+      border-right: none;
+    }
+
+    .quickref-section h4 {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .quickref-item {
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .quickref-item code {
+      color: var(--green);
+      background: var(--bg);
+      padding: 0.1rem 0.3rem;
+      font-size: 0.75rem;
+    }
+
+    .quickref-item .arrow {
+      color: var(--text-dim);
+      margin: 0 0.3rem;
+    }
+
+    .quickref-item .desc {
+      color: var(--text-dim);
+    }
+
+    .quickref-table {
+      width: 100%;
+      font-size: 0.75rem;
+      border-collapse: collapse;
+    }
+
+    .quickref-table td {
+      padding: 0.2rem 0;
+    }
+
+    .quickref-table td:first-child {
+      color: var(--green);
+      width: 40%;
+    }
+
+    .quickref-table td:last-child {
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 800px) {
+      .quickref-grid {
+        grid-template-columns: 1fr;
+      }
+      .quickref-section {
+        border-right: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -429,10 +555,9 @@
   <main>
     <section class="intro">
       <h2>yeah nah, it's a programming language</h2>
-      <p>SlangLang transpiles Australian slang to JavaScript. Why? Straya mate, we just do.</p>
+      <p>If a line of SlangLang can't be read aloud in an Australian accent without embarrassment, it probably violates the spec...</p>
       <div class="disclaimer">
-        ⚠️ This is a joke that got out of hand. Don't use it for anything important. 
-        Or do. I'm not your mum.
+        ⚠️ This is a joke that got out of hand. Don't use it for anything important.
       </div>
     </section>
 
@@ -471,6 +596,99 @@
         <div id="jsPanel" class="output-content">
           <pre id="jsOutput" class="js-output">// the javascript goes here
 // it's probably not pretty</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Reference -->
+    <div class="quickref open" id="quickref">
+      <div class="quickref-header" onclick="document.getElementById('quickref').classList.toggle('open')">
+        <span class="quickref-title">quick ref // the weird bits</span>
+        <span class="quickref-toggle"></span>
+      </div>
+      <div class="quickref-content">
+        <div class="quickref-grid">
+          
+          <div class="quickref-section">
+            <h4>strings (the fun way)</h4>
+            <div class="quickref-item">
+              <code>bloody Bruce mate</code><span class="arrow">→</span><span class="desc">"Bruce"</span>
+            </div>
+            <div class="quickref-item">
+              <code>"also works"</code><span class="arrow">→</span><span class="desc">normal quotes too</span>
+            </div>
+          </div>
+
+          <div class="quickref-section">
+            <h4>numbers (cooked)</h4>
+            <div class="quickref-item">
+              <code>flamin ripper</code><span class="arrow">→</span><span class="desc">6 (word length!)</span>
+            </div>
+            <div class="quickref-item">
+              <code>frothin 3.14</code><span class="arrow">→</span><span class="desc">3.14 (float)</span>
+            </div>
+            <div class="quickref-item">
+              <code>42</code><span class="arrow">→</span><span class="desc">just a number</span>
+            </div>
+          </div>
+
+          <div class="quickref-section">
+            <h4>functions</h4>
+            <div class="quickref-item">
+              <code>greet on the barbie:</code><span class="arrow">→</span><span class="desc">define func</span>
+            </div>
+            <div class="quickref-item">
+              <code>... with a, b:</code><span class="arrow">→</span><span class="desc">with params</span>
+            </div>
+            <div class="quickref-item">
+              <code>deal x plus y</code><span class="arrow">→</span><span class="desc">return value</span>
+            </div>
+            <div class="quickref-item">
+              <code>flamin greet with "Bob"</code><span class="arrow">→</span><span class="desc">call func</span>
+            </div>
+          </div>
+
+          <div class="quickref-section">
+            <h4>comments</h4>
+            <div class="quickref-item">
+              <code>oi this is ignored</code><span class="arrow">→</span><span class="desc">line comment</span>
+            </div>
+            <div class="quickref-item">
+              <code>aussie aussie aussie</code><span class="arrow">→</span><span class="desc">block start</span>
+            </div>
+            <div class="quickref-item">
+              <code>oi oi oi</code><span class="arrow">→</span><span class="desc">block end</span>
+            </div>
+          </div>
+
+          <div class="quickref-section">
+            <h4>data structures</h4>
+            <div class="quickref-item">
+              <code>esky: bloody a, bloody b.</code><span class="arrow">→</span><span class="desc">list</span>
+            </div>
+            <div class="quickref-item">
+              <code>tuckshop: x is 1, y is 2.</code><span class="arrow">→</span><span class="desc">dict</span>
+            </div>
+            <div class="quickref-item">
+              <code>scoffin item from list!</code><span class="arrow">→</span><span class="desc">for each</span>
+            </div>
+            <div class="quickref-item">
+              <code>pass the i, 10!</code><span class="arrow">→</span><span class="desc">for i in range(10)</span>
+            </div>
+          </div>
+
+          <div class="quickref-section">
+            <h4>primitives</h4>
+            <table class="quickref-table">
+              <tr><td>yeah</td><td>true</td></tr>
+              <tr><td>nah</td><td>false</td></tr>
+              <tr><td>nothin</td><td>null</td></tr>
+              <tr><td>tops</td><td>&gt; (greater than)</td></tr>
+              <tr><td>cops</td><td>&lt; (less than)</td></tr>
+              <tr><td>is</td><td>= (assignment)</td></tr>
+            </table>
+          </div>
+
         </div>
       </div>
     </div>
