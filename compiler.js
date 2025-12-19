@@ -17,6 +17,16 @@ function genExpr(expr) {
       return "[]";
     case "BinOp":
       return `(${genExpr(expr.left)} ${expr.op} ${genExpr(expr.right)})`;
+    case "Concat":
+      // String concatenation with space: x and y -> x + " " + y
+      return `(${genExpr(expr.left)} + " " + ${genExpr(expr.right)})`;
+    case "MethodCall": {
+      // Method chaining: x then foo -> x.foo()
+      // Convert multi-word method name to camelCase
+      const methodName = expr.method.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+      const methodArgs = expr.args.map(genExpr).join(", ");
+      return `${genExpr(expr.target)}.${methodName}(${methodArgs})`;
+    }
     case "UnaryOp":
       return `(${expr.op}${genExpr(expr.expr)})`;
     case "Call":

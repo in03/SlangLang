@@ -20,13 +20,13 @@ dealin from menu!
 who's full?
 
 Crikey! "--- Pass The Parcel (Range Loop) ---"
-pass the parcel, flamin five!
-  Crikey! parcel plus bloody chips mate
+pass the parcel, flamin tosser!
+  Crikey! parcel plus bloody _chips mate
 who's got it?
 
 Crikey! "--- Every Loop (Named Range) ---"
-every num in flamin duo:
-  Crikey! num
+every drongo in flamin brisbane:
+  Crikey! Bloody drongo mate.
 
 Crikey! "--- Conditionals ---"
 age is 25

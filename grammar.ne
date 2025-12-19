@@ -18,7 +18,10 @@ stmtend -> %NL {% id %}
         | %DOT {% id %}
         | %DOT %NL {% id %}
 
-topstatements -> statement {% d => [d[0]] %}
+leadingnl -> null {% d => null %}
+          | leadingnl %NL {% d => null %}
+
+topstatements -> leadingnl statement {% d => [d[1]] %}
               | topstatements stmtend statement {% d => [...d[0], d[2]] %}
               | topstatements stmtend {% d => d[0] %}
 
@@ -68,17 +71,37 @@ printstmt -> %KW_CRIKEY %BANG expr {%
 %}
 
 # ============ FUNCTIONS ============
-# prep greet barbie
+# Legacy: prep greet barbie
 funcdef -> %KW_PREP %IDENT %KW_BARBIE block {% 
   d => ({ type: "Function", name: d[1].value, params: [], body: d[3] }) 
 %}
 
-# prep greet barbie with name (and other name)
+# Legacy: prep greet barbie with name (and other name)
 funcdef -> %KW_PREP %IDENT %KW_BARBIE %KW_WITH paramlist block {% 
   d => ({ type: "Function", name: d[1].value, params: d[4], body: d[5] }) 
 %}
 
-# Multi-word params: prep greet barbie with the name and the age
+# New: greet on the barbie:
+funcdef -> %IDENT %KW_ON %KW_THE %KW_BARBIE %COLON block offbarbie:? {% 
+  d => ({ type: "Function", name: d[0].value, params: [], body: d[5] }) 
+%}
+
+# New: greet on the barbie with a, b:
+funcdef -> %IDENT %KW_ON %KW_THE %KW_BARBIE %KW_WITH commalist %COLON block offbarbie:? {% 
+  d => ({ type: "Function", name: d[0].value, params: d[5], body: d[7] }) 
+%}
+
+# New: greet on the barbie with a and b:
+funcdef -> %IDENT %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block offbarbie:? {% 
+  d => ({ type: "Function", name: d[0].value, params: d[5], body: d[7] }) 
+%}
+
+offbarbie -> %KW_OFF %KW_THE %KW_BARBIE %DOT {% d => null %}
+
+commalist -> multiident {% d => [joinIdent(d[0])] %}
+          | commalist %COMMA multiident {% d => [...d[0], joinIdent(d[2])] %}
+
+# Multi-word params with 'and' separator
 paramlist -> multiident {% d => [joinIdent(d[0])] %}
           | paramlist %KW_AND multiident {% d => [...d[0], joinIdent(d[2])] %}
 
@@ -113,8 +136,16 @@ mulexpr -> unaryexpr {% id %}
         | mulexpr %KW_TIMES unaryexpr {% d => ({ type: "BinOp", op: "*", left: d[0], right: d[2] }) %}
         | mulexpr %KW_DIVIDEDBY unaryexpr {% d => ({ type: "BinOp", op: "/", left: d[0], right: d[2] }) %}
 
-unaryexpr -> primary {% id %}
+unaryexpr -> chainexpr {% id %}
           | %KW_NOT unaryexpr {% d => ({ type: "UnaryOp", op: "!", expr: d[1] }) %}
+
+# Method chaining: x then foo -> x.foo()
+chainexpr -> primary {% id %}
+          | chainexpr %KW_THEN multiident {% d => ({ type: "MethodCall", target: d[0], method: joinIdent(d[2]), args: [] }) %}
+          | chainexpr %KW_THEN multiident %KW_WITH chainargs {% d => ({ type: "MethodCall", target: d[0], method: joinIdent(d[2]), args: d[4] }) %}
+
+chainargs -> addexpr {% d => [d[0]] %}
+          | chainargs %COMMA addexpr {% d => [...d[0], d[2]] %}
 
 primary -> %BOOL {% d => ({ type:"Bool", value: d[0].value === "yeah" }) %}
      | %NULL {% d => ({ type:"Null", value: null }) %}
@@ -205,6 +236,7 @@ funccallexpr -> %KW_FLAMIN %IDENT %KW_WITH arglist {%
 
 arglist -> expr {% d => [d[0]] %}
         | arglist %KW_AND expr {% d => [...d[0], d[2]] %}
+        | arglist %COMMA expr {% d => [...d[0], d[2]] %}
 
 # ============ ESKY (LIST) ============
 # goodies is esky: bloody beer, bloody chips.
@@ -297,7 +329,7 @@ sliceexpr -> %IDENT %KW_SHEEPSHEAR expr {%
 # scoffin <multi-word var> from <list>! ... who's full?
 # e.g., scoffin the tucker from sangas!
 # e.g., scoffin the tasty tucker from sangas!
-scoffinloop -> %KW_SCOFFIN multiident %KW_FROM %IDENT %BANG block loopend {% 
+scoffinloop -> %KW_SCOFFIN multiident %KW_FROM %IDENT %BANG block loopend:? {% 
   d => ({ type: "ForEach", iterator: joinIdent(d[1]), target: d[3].value, body: d[5] }) 
 %}
 
@@ -331,12 +363,12 @@ fullysickend -> %KW_FULLY %KW_SICK %DOT {% d => null %}
 
 # ============ CONDITIONALS ============
 # if <condition>, ... otherwise, ... make tracks.
-ifstmt -> %KW_IF expr %COMMA block elifclauses elseclause maketrackend {% 
+ifstmt -> %KW_IF expr %COMMA block elifclauses elseclause maketrackend:? {% 
   d => ({ type: "If", condition: d[1], body: d[3], elifs: d[4], else: d[5] }) 
 %}
 
 # Simple if without elif/else
-ifstmt -> %KW_IF expr %COMMA block maketrackend {% 
+ifstmt -> %KW_IF expr %COMMA block maketrackend:? {% 
   d => ({ type: "If", condition: d[1], body: d[3], elifs: [], else: null }) 
 %}
 

@@ -10,17 +10,18 @@ const BOUNDARY_KEYWORDS = new Set([
   "another", "shrimp", "ditch", "drop", "last", "first", "snag",
   "sheepshear", "tops", "cops", "up", "grab", "at",
   "if", "or", "otherwise", "make", "tracks", "equals", "not", "and",
-  "plus", "minus", "times", "dividedby",
+  "plus", "minus", "times", "dividedby", "then",
   "chuck", "lot", "mates", "call", "it",
   "bugger", "suss", "gimme",
-  "yeah", "nah", "nothin"
+  "yeah", "nah", "nothin",
+  "oi", "aussie", "on", "off"
 ]);
 
 // Punctuation that acts as boundaries
 const BOUNDARY_PUNCTUATION = new Set([":", ",", ".", "!", "?", "–"]);
 
 // Helper to create case-insensitive keyword regex for moo (no /i flag allowed)
-// Converts "word" to /[Ww][Oo][Rr][Dd]/
+// Converts "word" to /[Ww][Oo][Rr][Dd](?![a-zA-Z0-9_])/ (with negative lookahead for word boundary)
 function kw(word) {
   const pattern = word.split('').map(c => {
     if (/[a-z]/i.test(c)) {
@@ -28,12 +29,19 @@ function kw(word) {
     }
     return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape special chars
   }).join('');
-  return new RegExp(pattern);
+  // Add negative lookahead to prevent matching as prefix of longer identifier
+  return new RegExp(pattern + '(?![a-zA-Z0-9_])');
 }
 
 function createLexer() {
   const lexer = moo.states({
     main: {
+      // Comments - must come before other tokens
+      // Line comment: oi ...
+      LINE_COMMENT: /[Oo][Ii](?![Oo][Ii])[ \t][^\n]*/,
+      // Block comment: aussie aussie aussie ... oi oi oi
+      BLOCK_COMMENT_START: { match: /[Aa][Uu][Ss][Ss][Ii][Ee][ \t]+[Aa][Uu][Ss][Ss][Ii][Ee][ \t]+[Aa][Uu][Ss][Ss][Ii][Ee]/, push: "blockComment" },
+      
       WS: /[ \t]+/,
       // Keywords - order matters for matching (case-insensitive)
       KW_PREP: kw("prep"),
@@ -58,6 +66,7 @@ function createLexer() {
       KW_SCOFFIN: kw("scoffin"),
       KW_DEALIN: kw("dealin"),
       KW_DEAL: kw("deal"),
+      KW_THEN: kw("then"),  // Must come before KW_THE!
       KW_THE: kw("the"),
       KW_FROM: kw("from"),
       KW_PASS: kw("pass"),
@@ -93,9 +102,7 @@ function createLexer() {
       KW_MAKE: kw("make"),
       KW_TRACKS: kw("tracks"),
       
-      // Comparison operators
-      KW_BIGGERTHAN: kw("biggerthan"),
-      KW_SMALLERTHAN: kw("smallerthan"),
+      // Comparison operators (tops = >, cops = <)
       KW_EQUALS: kw("equals"),
       KW_NOT: kw("not"),
       KW_AND: kw("and"),
@@ -119,6 +126,13 @@ function createLexer() {
       // IO
       KW_GIMME: kw("gimme"),
       
+      // Function declaration (new syntax)
+      KW_ON: kw("on"),
+      KW_OFF: kw("off"),
+      
+      // Comment keyword (for line-ending oi that didn't match LINE_COMMENT)
+      KW_OI: kw("oi"),
+      
       // Punctuation
       COLON: ":",
       COMMA: ",",
@@ -133,6 +147,11 @@ function createLexer() {
       STRING: /"(?:[^"\\]|\\.)*"/,
       IDENT: /[a-zA-Z_][a-zA-Z0-9_]*/,
       NL: { match: /\r?\n/, lineBreaks: true },
+    },
+    // Block comment state: aussie aussie aussie ... oi oi oi
+    blockComment: {
+      BLOCK_COMMENT_END: { match: /[Oo][Ii][ \t]+[Oo][Ii][ \t]+[Oo][Ii]/, pop: 1 },
+      BLOCK_COMMENT_CONTENT: { match: /[^oO]+|[oO](?![iI][ \t]+[oO][iI][ \t]+[oO][iI])/, lineBreaks: true },
     }
   });
 
@@ -188,6 +207,10 @@ function createLexer() {
 
       // Skip whitespace tokens
       if (tok.type === "WS") continue;
+      
+      // Skip comments
+      if (tok.type === "LINE_COMMENT") continue;
+      if (tok.type === "BLOCK_COMMENT_START" || tok.type === "BLOCK_COMMENT_CONTENT" || tok.type === "BLOCK_COMMENT_END") continue;
 
       // Check if this is the start of a bloody...mate string
       if (tok.type === "KW_BLOODY") {
@@ -227,6 +250,22 @@ function createLexer() {
           spaces = peek.value.length;
           peek = lexer.next();
         }
+        
+        // Skip comments when peeking after newline
+        while (peek && (peek.type === "LINE_COMMENT" || peek.type === "BLOCK_COMMENT_START" || 
+               peek.type === "BLOCK_COMMENT_CONTENT" || peek.type === "BLOCK_COMMENT_END")) {
+          peek = lexer.next();
+          // If we hit another newline after comment, we need to re-process whitespace
+          if (peek && peek.type === "NL") {
+            peek = lexer.next();
+            if (peek && peek.type === "WS") {
+              spaces = peek.value.length;
+              peek = lexer.next();
+            } else {
+              spaces = 0;
+            }
+          }
+        }
 
         let prevIndent = indentStack[indentStack.length - 1];
         if (spaces > prevIndent) {
@@ -260,7 +299,7 @@ function createLexer() {
     save: lexer.save.bind(lexer),
     formatError: lexer.formatError.bind(lexer),
     has: (name) => {
-      const synthetics = ["INDENT", "DEDENT", "SLANG_STRING", "BLOODY_ITEM", "MULTI_WORD_IDENT"];
+      const synthetics = ["INDENT", "DEDENT", "SLANG_STRING", "BLOODY_ITEM", "MULTI_WORD_IDENT", "LINE_COMMENT", "BLOCK_COMMENT_START", "BLOCK_COMMENT_CONTENT", "BLOCK_COMMENT_END"];
       return synthetics.includes(name) || lexer.has(name);
     },
   };

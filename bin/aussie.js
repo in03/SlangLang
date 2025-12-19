@@ -12,6 +12,52 @@ if (!inputFile) {
 const source = fs.readFileSync(inputFile, "utf8");
 const sourceLines = source.split(/\r?\n/);
 
+// Block context detection - maps opening constructs to their terminators
+const BLOCK_TERMINATORS = {
+  // Pattern to match -> suggested terminator
+  "on the barbie": "off the barbie.",
+  "scoffin": "who's full?",
+  "dealin": "who's full?",
+  "pass the": "who's got it?",
+  "til ": "fully sick.",
+  "if ": "make tracks.",
+  "or if ": "make tracks.",
+  "otherwise": "make tracks.",
+};
+
+// Find the most recent unclosed block before a given line
+function findOpenBlock(lines, errorLine) {
+  const openBlocks = [];
+  let indentStack = [0];
+  
+  for (let i = 0; i < Math.min(errorLine, lines.length); i++) {
+    const line = lines[i];
+    const trimmed = line.trim().toLowerCase();
+    const indent = line.match(/^(\s*)/)[1].length;
+    
+    // Check for block openers
+    for (const [pattern, terminator] of Object.entries(BLOCK_TERMINATORS)) {
+      if (trimmed.includes(pattern)) {
+        openBlocks.push({ pattern, terminator, line: i + 1, indent });
+        break;
+      }
+    }
+    
+    // Check for block closers
+    const closers = ["off the barbie", "who's full", "who's got it", "fully sick", "make tracks"];
+    for (const closer of closers) {
+      if (trimmed.includes(closer)) {
+        // Pop matching block
+        if (openBlocks.length > 0) {
+          openBlocks.pop();
+        }
+      }
+    }
+  }
+  
+  return openBlocks.length > 0 ? openBlocks[openBlocks.length - 1] : null;
+}
+
 function formatError(err, source) {
   console.error("\n\x1b[31m✗ Strewth! Parse Error\x1b[0m\n");
   
@@ -85,6 +131,22 @@ function formatError(err, source) {
       console.error(`      List items (bloody X,) only work inside esky: declarations.`);
     } else if (tokType === "SLANG_STRING") {
       console.error(`\n\x1b[36mHint:\x1b[0m Slang strings need to end with "mate".`);
+    } else if (tokType === "DEDENT" || tokType === "NL" || tokType === "IDENT") {
+      // Check for unclosed blocks
+      const openBlock = findOpenBlock(sourceLines, line || 1);
+      if (openBlock) {
+        console.error(`\n\x1b[36mHint:\x1b[0m Looks like a block starting at line ${openBlock.line} might not be closed.`);
+        console.error(`      Try adding "${openBlock.terminator}" to close the "${openBlock.pattern}" block.`);
+      }
+    }
+  }
+  
+  // If no specific token hint, still check for unclosed blocks
+  if (!tokenMatch) {
+    const openBlock = findOpenBlock(sourceLines, sourceLines.length);
+    if (openBlock) {
+      console.error(`\n\x1b[36mHint:\x1b[0m Looks like a block starting at line ${openBlock.line} might not be closed.`);
+      console.error(`      Try adding "${openBlock.terminator}" to close the "${openBlock.pattern}" block.`);
     }
   }
   

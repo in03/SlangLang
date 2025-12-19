@@ -87,7 +87,7 @@ All SlangLang keywords are **case-insensitive**. This allows for more natural, s
 ```slang
 Crikey! "Hello"      // Capitalized at start of line
 crikey! "hello"      // lowercase works too
-If score biggerthan 90,
+If score tops 90,
   Crikey! "Ripper!"
 Make tracks.
 ```
@@ -109,11 +109,36 @@ Boundary markers include:
 * Punctuation (`:`, `,`, `.`, `!`, `?`)
 * Newlines
 
+### Comments
+
+SlangLang supports both line and block comments:
+
+**Line comments** start with `oi` followed by a space:
+
+```slang
+oi This is a line comment
+x is 5  oi This won't work - oi must be at start of content
+```
+
+**Block comments** use the classic Aussie chant:
+
+```slang
+aussie aussie aussie
+This is a block comment
+that spans multiple lines
+oi oi oi
+```
+
 ### Tokens (Implemented)
 
 | Token           | Meaning                        |
 | --------------- | ------------------------------ |
-| `prep`          | Function definition keyword    |
+| `oi`            | Line comment start             |
+| `aussie aussie aussie` | Block comment open      |
+| `oi oi oi`      | Block comment close            |
+| `prep`          | Function definition keyword (legacy) |
+| `on`            | Function definition (new syntax) |
+| `off`           | Function terminator (new syntax) |
 | `barbie`        | Function body start marker     |
 | `with`          | Parameter list start           |
 | `and`           | Parameter/argument separator   |
@@ -161,14 +186,15 @@ Boundary markers include:
 
 | Token         | Meaning                  |
 | ------------- | ------------------------ |
-| `biggerthan`  | Greater than (>)         |
-| `smallerthan` | Less than (<)            |
+| `tops`        | Greater than (>)         |
+| `cops`        | Less than (<)            |
 | `equals`      | Equality (===)           |
 | `not`         | Negation / not equals    |
 | `plus`        | Addition (+)             |
 | `minus`       | Subtraction (-)          |
 | `times`       | Multiplication (*)       |
 | `dividedby`   | Division (/)             |
+| `then`        | Method chaining          |
 
 ### Conditional Tokens
 
@@ -323,11 +349,64 @@ let weight = 2.5;
 * Numeric literal (direct or `flamin`/`frothin`/`spewin`)
 * Variable references
 * Arithmetic expressions (`plus`, `minus`, `times`, `dividedby`)
-* Comparison expressions (`biggerthan`, `smallerthan`, `equals`, `not equals`)
+* Comparison expressions (`tops`, `cops`, `equals`, `not equals`)
 * Index/key access (`grab X from Y`)
 * Function calls (`flamin funcname with args`)
+* Method chaining (`then`)
 * List expressions (`esky: items`)
 * Dictionary expressions (`tuckshop: entries`)
+
+### Method Chaining
+
+The `then` keyword enables fluent method chaining. Multi-word method names are converted to camelCase:
+
+**Without arguments:**
+
+```slang
+name is bloody bruce mate
+result is name then to upper case
+Crikey! result
+```
+
+Compiles to:
+
+```js
+let name = "bruce";
+let result = name.toUpperCase();
+console.log(result);  // "BRUCE"
+```
+
+**With arguments (comma-separated after `with`):**
+
+```slang
+text is bloody hello world mate
+result is text then slice with 0, 5
+Crikey! result
+```
+
+Compiles to:
+
+```js
+let text = "hello world";
+let result = text.slice(0, 5);
+console.log(result);  // "hello"
+```
+
+**Chaining multiple methods:**
+
+```slang
+messy is bloody   hello world   mate
+clean is messy then trim then to upper case
+Crikey! clean
+```
+
+Compiles to:
+
+```js
+let messy = "   hello world   ";
+let clean = messy.trim().toUpperCase();
+console.log(clean);  // "HELLO WORLD"
+```
 
 ### Arithmetic Operators
 
@@ -338,12 +417,14 @@ let weight = 2.5;
 | `times`     | `*`    | `x times y`          |
 | `dividedby` | `/`    | `x dividedby y`      |
 
+Note: `plus` works on both numbers and strings (uses JS `+` operator).
+
 ### Comparison Operators
 
 | Slang         | JS    | Example                |
 | ------------- | ----- | ---------------------- |
-| `biggerthan`  | `>`   | `x biggerthan 5`       |
-| `smallerthan` | `<`   | `x smallerthan 10`     |
+| `tops`        | `>`   | `x tops 5`             |
+| `cops`        | `<`   | `x cops 10`            |
 | `equals`      | `===` | `x equals y`           |
 | `not equals`  | `!==` | `x not equals y`       |
 | `is`          | `===` | `x is y` (in compare)  |
@@ -393,34 +474,60 @@ deal result
 
 ## 8. Functions
 
-### Function Definition (No Parameters)
+### Function Definition (New Syntax)
+
+The preferred way to define functions uses the "on the barbie" syntax:
+
+**No parameters:**
+
+```slang
+greet on the barbie:
+  Crikey! "gday"
+  fair go yeah
+off the barbie.
+```
+
+**With comma-separated parameters:**
+
+```slang
+add on the barbie with a, b:
+  deal a plus b
+off the barbie.
+```
+
+**With `and`-separated parameters:**
+
+```slang
+greet on the barbie with name and age:
+  Crikey! name
+  deal yeah
+```
+
+**With indented parameter list:**
+
+```slang
+calculate on the barbie with
+  first value
+  second value
+  multiplier
+:
+  deal first value times second value times multiplier
+```
+
+The `off the barbie.` terminator is **optional** when indentation is clear.
+
+### Function Definition (Legacy Syntax)
+
+The original `prep ... barbie` syntax is still supported:
 
 ```slang
 prep greet barbie
   Crikey! "gday"
   fair go yeah
-```
-
-### Function Definition (With Parameters)
-
-```slang
-prep greet barbie with name
-  Crikey! name
-  deal yeah
 
 prep add barbie with a and b
   deal a plus b
 ```
-
-Grammar:
-
-```
-prep IDENT barbie [with paramlist] block
-```
-
-* Parameters separated by `and`
-* Indentation defines body
-* Compiles to JS function declaration
 
 ### Function Calls
 
@@ -605,10 +712,12 @@ fully sick.
 | `who's got it?`  | pass the parcel   |
 | `fully sick.`    | til               |
 
+**Note:** All block terminators are **optional** when using indentation. The parser can infer block boundaries from dedent. Terminators add Aussie flavor and can help with error messages.
+
 ### Conditionals
 
 ```slang
-if age biggerthan 18,
+if age tops 18,
   Crikey! "You're an adult"
 make tracks.
 ```
@@ -616,9 +725,9 @@ make tracks.
 With else-if and else:
 
 ```slang
-if score biggerthan 90,
+if score tops 90,
   Crikey! "Ripper!"
-or if score biggerthan 50,
+or if score tops 50,
   Crikey! "Not bad"
 otherwise,
   Crikey! "Better luck next time"
@@ -767,7 +876,7 @@ Planned enhancements:
 * ✅ Range loops (pass the parcel, every)
 * ✅ While-not loop (til...fully sick)
 * ✅ Conditionals (if/or if/otherwise/make tracks)
-* ✅ Comparison operators (biggerthan, smallerthan, equals)
+* ✅ Comparison operators (tops, cops, equals)
 * ✅ Arithmetic operators (plus, minus, times, dividedby)
 * ✅ List operations (append, remove, pop, slice)
 * ✅ Grab (index/key access)
@@ -777,6 +886,10 @@ Planned enhancements:
 * ✅ Spewin as float/length keyword
 * ✅ Deal as return alternative
 * ✅ Multi-word identifier support
+* ✅ Comments (oi line, aussie aussie aussie block)
+* ✅ New function syntax (on the barbie)
+* ✅ Optional block terminators
+* ✅ Method chaining (then, then...with)
 
 ### Short Term
 

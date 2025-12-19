@@ -198,3 +198,9 @@ crikey - bloody fibs.
 - "plus", "minus" +, - operators.
 - "top up" append to array/list.
 - "Gimme count" count = read stdin.
+
+---
+
+smoko = time.sleep()
+oi = + " " + concatenate with whitespace.
+straya = block comment
