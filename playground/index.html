@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlangLang // yeah nah programming</title>
+  <meta name="description" content="SlangLang - a programming language that's had a few too many. Transpiles Aussie slang to JavaScript.">
+  
+  <!-- Fonts - monospace only, we're not fancy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- CodeMirror -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #333;
+      --text: #e0e0e0;
+      --text-dim: #666;
+      --accent: #ffcc00;
+      --accent-dim: #997a00;
+      --green: #00ff88;
+      --red: #ff4444;
+      --blue: #4488ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* Header - minimal */
+    header {
+      border-bottom: 2px solid var(--border);
+      padding: 1rem 1.5rem;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .logo-tag {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+
+    .header-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      transition: all 0.1s;
+    }
+
+    .header-links a:hover {
+      color: var(--text);
+      border-color: var(--text);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Intro - dry and minimal */
+    .intro {
+      margin-bottom: 2rem;
+      max-width: 600px;
+    }
+
+    .intro h2 {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .intro p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .intro .disclaimer {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-left: 2px solid var(--accent-dim);
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+
+    /* Presets - brutalist buttons */
+    .presets-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      border: 2px solid var(--border);
+      width: fit-content;
+    }
+
+    .preset-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-right: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: all 0.1s;
+    }
+
+    .preset-btn:last-child {
+      border-right: none;
+    }
+
+    .preset-btn:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .preset-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    /* Editor Layout */
+    .playground {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 2px solid var(--border);
+    }
+
+    @media (max-width: 800px) {
+      .playground {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--surface);
+    }
+
+    .panel:first-child {
+      border-right: 2px solid var(--border);
+    }
+
+    @media (max-width: 800px) {
+      .panel:first-child {
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+      }
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .panel-title {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .run-btn {
+      padding: 0.4rem 1rem;
+      background: var(--green);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.1s;
+    }
+
+    .run-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .run-btn:active {
+      filter: brightness(0.9);
+    }
+
+    /* CodeMirror - raw terminal vibes */
+    .CodeMirror {
+      height: 400px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      background: var(--bg);
+      color: var(--text);
+      border: none;
+    }
+
+    .CodeMirror-gutters {
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+    }
+
+    .CodeMirror-linenumber {
+      color: var(--text-dim);
+    }
+
+    .CodeMirror-cursor {
+      border-left: 2px solid var(--accent);
+    }
+
+    .CodeMirror-selected {
+      background: #333 !important;
+    }
+
+    .CodeMirror-activeline-background {
+      background: #1a1a1a;
+    }
+
+    /* SlangLang syntax highlighting - high contrast */
+    .cm-keyword { color: var(--accent); font-weight: 500; }
+    .cm-builtin { color: var(--green); font-weight: 500; }
+    .cm-string { color: #ff9966; }
+    .cm-number { color: var(--blue); }
+    .cm-variable { color: var(--text); }
+    .cm-comment { color: var(--text-dim); }
+    .cm-punctuation { color: var(--accent); }
+
+    /* Output */
+    .output {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      padding: 1rem;
+      min-height: 400px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: var(--bg);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .output.error {
+      color: var(--red);
+    }
+
+    .output.success {
+      color: var(--green);
+    }
+
+    .output-placeholder {
+      color: var(--text-dim);
+    }
+
+    /* JS Output */
+    .js-output {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      padding: 1rem;
+      background: var(--bg);
+      color: var(--text-dim);
+      min-height: 400px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Tabs */
+    .output-tabs {
+      display: flex;
+      gap: 0;
+    }
+
+    .output-tab {
+      padding: 0.4rem 0.75rem;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid transparent;
+      transition: all 0.1s;
+    }
+
+    .output-tab:hover {
+      color: var(--text);
+    }
+
+    .output-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .output-content {
+      display: none;
+    }
+
+    .output-content.active {
+      display: block;
+    }
+
+    /* Footer - minimal */
+    footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .footer-left {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      max-width: 400px;
+    }
+
+    .footer-left p {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Scrollbar - minimal */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-dim);
+    }
+
+    /* Keyboard hint */
+    .kbd {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a href="#" class="logo">
+        <h1>SlangLang</h1>
+        <span class="logo-tag">// v0.2.0 - probably buggy</span>
+      </a>
+      <div class="header-links">
+        <a href="https://github.com/in03/slanglang" target="_blank" rel="noopener">src</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>yeah nah, it's a programming language</h2>
+      <p>SlangLang transpiles Australian slang to JavaScript. Why? Straya mate, we just do.</p>
+      <div class="disclaimer">
+        ⚠️ This is a joke that got out of hand. Don't use it for anything important. 
+        Or do. I'm not your mum.
+      </div>
+    </section>
+
+    <div class="presets-bar">
+      <button class="preset-btn active" data-preset="hello">hello world</button>
+      <button class="preset-btn" data-preset="loops">loops</button>
+      <button class="preset-btn" data-preset="functions">functions</button>
+      <button class="preset-btn" data-preset="data">data</button>
+      <button class="preset-btn" data-preset="conditions">conditions</button>
+    </div>
+
+    <div class="playground">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">input.slang</span>
+          <button class="run-btn" id="runBtn">run</button>
+        </div>
+        <div class="editor-wrapper">
+          <textarea id="editor"></textarea>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">output</span>
+          <div class="output-tabs">
+            <button class="output-tab active" data-tab="output">stdout</button>
+            <button class="output-tab" data-tab="js">transpiled.js</button>
+          </div>
+        </div>
+        <div id="outputPanel" class="output-content active">
+          <div id="output" class="output">
+            <span class="output-placeholder">// hit run or press <span class="kbd">ctrl</span>+<span class="kbd">enter</span></span>
+          </div>
+        </div>
+        <div id="jsPanel" class="output-content">
+          <pre id="jsOutput" class="js-output">// the javascript goes here
+// it's probably not pretty</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-left">
+        <p>made for kicks and giggles</p>
+        <p>by <a href="https://calebtrevatt.com" target="_blank">@caleb.trevatt</a></p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/in03/slanglang" target="_blank">github</a>
+        <a href="https://github.com/in03/slanglang/blob/main/spec.md" target="_blank">spec</a>
+        <a href="https://github.com/in03/slanglang/issues" target="_blank">complain</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SlangLang Compiler Bundle -->
+  <script src="slanglang.bundle.js"></script>
+  
+  <script>
+    // SlangLang syntax highlighting mode for CodeMirror
+    CodeMirror.defineMode("slanglang", function() {
+      const keywords = new Set([
+        "prep", "barbie", "with", "crikey", "fair", "go", "deal", "is", 
+        "bloody", "flamin", "frothin", "spewin", "mate", "esky", "tuckshop",
+        "empty", "scoffin", "dealin", "from", "pass", "the", "til", "fully",
+        "sick", "every", "in", "another", "shrimp", "ditch", "drop", "last",
+        "first", "snag", "sheepshear", "tops", "cops", "up", "grab", "at",
+        "if", "or", "otherwise", "make", "tracks", "equals", "not", "and",
+        "plus", "minus", "times", "dividedby", "then", "chuck", "lot", "mates",
+        "call", "it", "bugger", "suss", "gimme", "yeah", "nah", "nothin",
+        "on", "off", "who's", "full", "got"
+      ]);
+      
+      const builtins = new Set(["Crikey", "crikey"]);
+      
+      return {
+        startState: function() {
+          return { inString: false, inBlockComment: false, stringWordCount: 0 };
+        },
+        token: function(stream, state) {
+          // Block comment
+          if (state.inBlockComment) {
+            if (stream.match(/oi\s+oi\s+oi/i)) {
+              state.inBlockComment = false;
+              return "comment";
+            }
+            stream.next();
+            return "comment";
+          }
+          
+          // Check for block comment start
+          if (stream.match(/aussie\s+aussie\s+aussie/i)) {
+            state.inBlockComment = true;
+            return "comment";
+          }
+          
+          // Line comment (oi followed by space, but not oi oi oi)
+          if (stream.match(/oi(?!\s+oi)\s/i)) {
+            stream.skipToEnd();
+            return "comment";
+          }
+          
+          // Skip whitespace
+          if (stream.match(/\s+/)) {
+            return null;
+          }
+          
+          // Bloody string handling
+          if (stream.match(/bloody\b/i)) {
+            state.inString = true;
+            state.stringWordCount = 0;
+            return "keyword";
+          }
+          
+          if (state.inString) {
+            if (stream.match(/mate\b/i)) {
+              state.inString = false;
+              return "keyword";
+            }
+            
+            if (state.stringWordCount >= 1 && stream.match(/[,\.!\?\n]/)) {
+              state.inString = false;
+              return "punctuation";
+            }
+            
+            if (stream.match(/[a-zA-Z_][a-zA-Z0-9_']*/)) {
+              state.stringWordCount++;
+              return "string";
+            }
+            
+            stream.next();
+            return "string";
+          }
+          
+          // Quoted string
+          if (stream.match(/"[^"]*"/)) {
+            return "string";
+          }
+          
+          // Numbers
+          if (stream.match(/-?\d+(\.\d+)?/)) {
+            return "number";
+          }
+          
+          // Punctuation
+          if (stream.match(/[,:\.!\?–]/)) {
+            return "punctuation";
+          }
+          
+          // Words
+          if (stream.match(/[a-zA-Z_][a-zA-Z0-9_']*/)) {
+            const word = stream.current().toLowerCase().replace(/'/g, "'");
+            if (builtins.has(stream.current())) return "builtin";
+            if (keywords.has(word)) return "keyword";
+            return "variable";
+          }
+          
+          stream.next();
+          return null;
+        }
+      };
+    });
+  </script>
+  
+  <script>
+    // Example presets
+    const presets = {
+      hello: `oi this is a comment. g'day.
+
+Crikey! "Hello, World!"
+Crikey! "Welcome to SlangLang"
+
+name is bloody Bruce mate
+Crikey! name
+
+oi method chaining? yeah we got that
+greeting is bloody gday bruce mate
+result is greeting then to upper case
+Crikey! result`,
+
+      loops: `oi looping through a list
+
+sangas is esky: bloody ham, bloody cheese, bloody salad.
+
+Crikey! "What's in the esky?"
+scoffin snag from sangas!
+  Crikey! snag
+who's full?
+
+oi range loop
+Crikey! "Counting..."
+pass the chips, 5!
+  Crikey! chips
+who's got it?`,
+
+      functions: `oi functions go on the barbie
+
+greet on the barbie with name:
+  Crikey! "G'day,"
+  Crikey! name
+off the barbie.
+
+add on the barbie with a, b:
+  deal a plus b
+off the barbie.
+
+oi call em
+flamin greet with "Bruce"
+
+result is flamin add with 10, 5
+Crikey! "10 + 5 ="
+Crikey! result`,
+
+      data: `oi esky = list, tuckshop = dict
+
+goodies is esky: bloody beer, bloody chips, bloody snags.
+Crikey! "In the esky:"
+Crikey! goodies
+
+menu is tuckshop: pies is 5, sauce is bloody tomato mate, drinks is 3.
+Crikey! "Menu:"
+Crikey! menu
+
+oi iterate the dict
+Crikey! "Items:"
+dealin from menu!
+  Crikey! item
+  Crikey! price
+who's full?`,
+
+      conditions: `oi conditionals
+
+score is 85
+
+if score tops 90,
+  Crikey! "Ripper! Top marks!"
+or if score tops 70,
+  Crikey! "Not bad mate"
+or if score tops 50,
+  Crikey! "She'll be right"
+otherwise,
+  Crikey! "Yeah nah"
+make tracks.
+
+oi another one
+age is 21
+if age tops 17,
+  Crikey! "Can drink"
+make tracks.`
+    };
+
+    // Initialize CodeMirror
+    const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+      mode: 'slanglang',
+      lineNumbers: true,
+      lineWrapping: true,
+      tabSize: 2,
+      indentWithTabs: false,
+      styleActiveLine: true,
+    });
+
+    // Load default preset
+    editor.setValue(presets.hello);
+
+    // Preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        editor.setValue(presets[btn.dataset.preset]);
+        document.getElementById('output').innerHTML = '<span class="output-placeholder">// hit run or press <span class="kbd">ctrl</span>+<span class="kbd">enter</span></span>';
+        document.getElementById('jsOutput').textContent = '// the javascript goes here\n// it\'s probably not pretty';
+      });
+    });
+
+    // Tab switching
+    document.querySelectorAll('.output-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.output-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab + 'Panel').classList.add('active');
+      });
+    });
+
+    // Run button
+    document.getElementById('runBtn').addEventListener('click', () => {
+      const code = editor.getValue();
+      const outputEl = document.getElementById('output');
+      const jsOutputEl = document.getElementById('jsOutput');
+      
+      try {
+        const result = window.SlangLang.run(code);
+        outputEl.className = 'output success';
+        outputEl.textContent = result.output || '// no output';
+        jsOutputEl.textContent = result.js;
+      } catch (err) {
+        outputEl.className = 'output error';
+        outputEl.textContent = '// error: ' + err.message;
+        jsOutputEl.textContent = '// compilation failed\n// ' + err.message;
+      }
+    });
+
+    // Keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('runBtn').click();
+      }
+    });
+  </script>
+</body>
+</html>
