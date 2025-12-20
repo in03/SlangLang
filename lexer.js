@@ -245,10 +245,49 @@ function createLexer() {
           peek2 = lexer.next();
         }
         
-        if (peek2 && (peek2.type === "COMMA" || peek2.type === "DOT" || peek2.type === "NL")) {
-          // BLOODY_ITEM: bloody <word>,  or  bloody <word>.
+        if (peek2 && (peek2.type === "COMMA" || peek2.type === "NL")) {
+          // BLOODY_ITEM: bloody <word>,  or  bloody <word>\n
           queue.push(peek2);
           return { type: "BLOODY_ITEM", value: peek.value || peek.text };
+        } else if (peek2 && peek2.type === "DOT") {
+          // Could be BLOODY_ITEM (bloody word.) or string with internal dot (bloody word. more mate)
+          // Keep peeking to collect all dots and see what follows
+          let dots = ["."];
+          let peek3 = lexer.next();
+          
+          // Collect consecutive dots
+          while (peek3 && peek3.type === "DOT") {
+            dots.push(".");
+            peek3 = lexer.next();
+          }
+          
+          // Skip whitespace after dots
+          let wsAfterDots = [];
+          while (peek3 && peek3.type === "WS") {
+            wsAfterDots.push(peek3.value);
+            peek3 = lexer.next();
+          }
+          
+          if (!peek3 || peek3.type === "NL") {
+            // bloody word... at end of line → BLOODY_ITEM (dots are statement terminators)
+            if (peek3) queue.push(peek3);
+            // Push remaining dots back (all but one which terminates)
+            for (let i = 1; i < dots.length; i++) {
+              queue.push({ type: "DOT", value: "." });
+            }
+            queue.push({ type: "DOT", value: "." });
+            return { type: "BLOODY_ITEM", value: peek.value || peek.text };
+          } else {
+            // More content follows → multi-word string containing the dots
+            inBloodyString = true;
+            bloodyStringContent = [peek.value || peek.text, ...dots];
+            // Add whitespace
+            for (const ws of wsAfterDots) {
+              bloodyStringContent.push(ws);
+            }
+            bloodyStringContent.push(peek3.value || peek3.text);
+            continue;
+          }
         } else if (peek2 && peek2.type === "KW_MATE") {
           // Single word bloody string: bloody <word> mate
           return { type: "SLANG_STRING", value: peek.value || peek.text };
