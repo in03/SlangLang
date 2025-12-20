@@ -146,6 +146,11 @@ function createLexer() {
       NUMBER: /-?[0-9]+(?:\.[0-9]+)?/,
       STRING: /"(?:[^"\\]|\\.)*"/,
       IDENT: /[a-zA-Z_][a-zA-Z0-9_]*/,
+      // Special characters that can appear in bloody...mate strings
+      SQUOTE: "'",
+      DQUOTE: "\"",
+      BACKTICK: "`",
+      CHAR: /[^\s]/,  // Fallback for any other single character
       NL: { match: /\r?\n/, lineBreaks: true },
     },
     // Block comment state: aussie aussie aussie ... oi oi oi
@@ -192,14 +197,17 @@ function createLexer() {
       if (inBloodyString) {
         if (tok.type === "KW_MATE") {
           inBloodyString = false;
-          const content = bloodyStringContent.join(" ").trim();
+          const content = bloodyStringContent.join("").trim();
           bloodyStringContent = [];
           return { type: "SLANG_STRING", value: content };
         } else if (tok.type === "NL") {
           throw new Error("Unexpected newline in bloody...mate string. Did you forget 'mate'?");
         } else if (tok.type === "WS") {
+          // Preserve whitespace in bloody strings
+          bloodyStringContent.push(tok.value);
           continue;
         } else {
+          // Capture any token's value - including special chars like quotes
           bloodyStringContent.push(tok.value || tok.text);
           continue;
         }
@@ -214,6 +222,7 @@ function createLexer() {
 
       // Check if this is the start of a bloody...mate string
       if (tok.type === "KW_BLOODY") {
+        // Skip initial whitespace after "bloody"
         let peek = lexer.next();
         while (peek && peek.type === "WS") {
           peek = lexer.next();
@@ -223,19 +232,33 @@ function createLexer() {
           return tok;
         }
         
+        // For BLOODY_ITEM detection, we need to check if it's a single word followed by boundary
+        // Collect everything until we can determine the type
+        let collectedTokens = [peek];
+        let collectedWS = [];
+        
         let peek2 = lexer.next();
+        // Track whitespace separately for potential BLOODY_ITEM case
         while (peek2 && peek2.type === "WS") {
+          collectedWS.push(peek2);
           peek2 = lexer.next();
         }
         
         if (peek2 && (peek2.type === "COMMA" || peek2.type === "DOT" || peek2.type === "NL")) {
+          // BLOODY_ITEM: bloody <word>,  or  bloody <word>.
           queue.push(peek2);
           return { type: "BLOODY_ITEM", value: peek.value || peek.text };
         } else if (peek2 && peek2.type === "KW_MATE") {
+          // Single word bloody string: bloody <word> mate
           return { type: "SLANG_STRING", value: peek.value || peek.text };
         } else {
+          // Multi-word bloody string - preserve whitespace
           inBloodyString = true;
           bloodyStringContent = [peek.value || peek.text];
+          // Add collected whitespace
+          for (const ws of collectedWS) {
+            bloodyStringContent.push(ws.value);
+          }
           if (peek2) {
             bloodyStringContent.push(peek2.value || peek2.text);
           }
