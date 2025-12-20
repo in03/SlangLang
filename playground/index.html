@@ -14,9 +14,18 @@
   <!-- CodeMirror -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <!-- CodeMirror Themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/solarized-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/nord.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/gruvbox-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/one-dark.min.css">
   
   <style>
-    :root {
+    /* Default theme - brutal */
+    :root, [data-theme="brutal"] {
       --bg: #0a0a0a;
       --surface: #111;
       --border: #333;
@@ -27,6 +36,91 @@
       --green: #00ff88;
       --red: #ff4444;
       --blue: #4488ff;
+      --cm-theme: none;
+    }
+
+    /* Dracula */
+    [data-theme="dracula"] {
+      --bg: #282a36;
+      --surface: #21222c;
+      --border: #44475a;
+      --text: #f8f8f2;
+      --text-dim: #6272a4;
+      --accent: #bd93f9;
+      --accent-dim: #6c5ce7;
+      --green: #50fa7b;
+      --red: #ff5555;
+      --blue: #8be9fd;
+    }
+
+    /* Nord */
+    [data-theme="nord"] {
+      --bg: #2e3440;
+      --surface: #3b4252;
+      --border: #4c566a;
+      --text: #eceff4;
+      --text-dim: #7b88a1;
+      --accent: #88c0d0;
+      --accent-dim: #5e81ac;
+      --green: #a3be8c;
+      --red: #bf616a;
+      --blue: #81a1c1;
+    }
+
+    /* Gruvbox */
+    [data-theme="gruvbox-dark"] {
+      --bg: #282828;
+      --surface: #1d2021;
+      --border: #504945;
+      --text: #ebdbb2;
+      --text-dim: #928374;
+      --accent: #fabd2f;
+      --accent-dim: #d79921;
+      --green: #b8bb26;
+      --red: #fb4934;
+      --blue: #83a598;
+    }
+
+    /* Monokai */
+    [data-theme="monokai"] {
+      --bg: #272822;
+      --surface: #1e1f1c;
+      --border: #49483e;
+      --text: #f8f8f2;
+      --text-dim: #75715e;
+      --accent: #f92672;
+      --accent-dim: #ae81ff;
+      --green: #a6e22e;
+      --red: #f92672;
+      --blue: #66d9ef;
+    }
+
+    /* Solarized Dark */
+    [data-theme="solarized-dark"] {
+      --bg: #002b36;
+      --surface: #073642;
+      --border: #586e75;
+      --text: #839496;
+      --text-dim: #657b83;
+      --accent: #b58900;
+      --accent-dim: #cb4b16;
+      --green: #859900;
+      --red: #dc322f;
+      --blue: #268bd2;
+    }
+
+    /* Material Darker */
+    [data-theme="material-darker"] {
+      --bg: #212121;
+      --surface: #303030;
+      --border: #424242;
+      --text: #eeffff;
+      --text-dim: #545454;
+      --accent: #89ddff;
+      --accent-dim: #82aaff;
+      --green: #c3e88d;
+      --red: #f07178;
+      --blue: #82aaff;
     }
 
     * {
@@ -232,13 +326,10 @@
       height: 400px;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 13px;
-      background: var(--bg);
-      color: var(--text);
       border: none;
     }
 
     .CodeMirror-gutters {
-      background: var(--bg);
       border-right: 1px solid var(--border);
     }
 
@@ -250,22 +341,61 @@
       border-left: 2px solid var(--accent);
     }
 
-    .CodeMirror-selected {
-      background: #333 !important;
+    /* Custom syntax highlighting for brutal theme (no CodeMirror theme) */
+    [data-theme="brutal"] .cm-keyword { color: var(--accent); font-weight: 500; }
+    [data-theme="brutal"] .cm-builtin { color: var(--green); font-weight: 500; }
+    [data-theme="brutal"] .cm-string { color: #ff9966; }
+    [data-theme="brutal"] .cm-number { color: var(--blue); }
+    [data-theme="brutal"] .cm-variable { color: var(--text); }
+    [data-theme="brutal"] .cm-comment { color: var(--text-dim); }
+    [data-theme="brutal"] .cm-punctuation { color: var(--accent); }
+
+    [data-theme="brutal"] .CodeMirror {
+      background: var(--bg);
+      color: var(--text);
     }
 
-    .CodeMirror-activeline-background {
-      background: #1a1a1a;
+    [data-theme="brutal"] .CodeMirror-gutters {
+      background: var(--bg);
     }
 
-    /* SlangLang syntax highlighting - high contrast */
-    .cm-keyword { color: var(--accent); font-weight: 500; }
-    .cm-builtin { color: var(--green); font-weight: 500; }
-    .cm-string { color: #ff9966; }
-    .cm-number { color: var(--blue); }
-    .cm-variable { color: var(--text); }
-    .cm-comment { color: var(--text-dim); }
-    .cm-punctuation { color: var(--accent); }
+    /* Theme selector */
+    .theme-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .theme-selector label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .theme-selector select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.3rem center;
+      padding-right: 1.5rem;
+    }
+
+    .theme-selector select:hover {
+      border-color: var(--text);
+    }
+
+    .theme-selector select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
 
     /* Output */
     .output {
@@ -572,7 +702,21 @@
     <div class="playground">
       <div class="panel">
         <div class="panel-header">
-          <span class="panel-title">input.slang</span>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="panel-title">input.slang</span>
+            <div class="theme-selector">
+              <label for="themeSelect">theme</label>
+              <select id="themeSelect">
+                <option value="brutal" selected>brutal</option>
+                <option value="dracula">dracula</option>
+                <option value="nord">nord</option>
+                <option value="gruvbox-dark">gruvbox</option>
+                <option value="monokai">monokai</option>
+                <option value="solarized-dark">solarized</option>
+                <option value="material-darker">material</option>
+              </select>
+            </div>
+          </div>
           <button class="run-btn" id="runBtn">run</button>
         </div>
         <div class="editor-wrapper">
@@ -595,7 +739,7 @@
         </div>
         <div id="jsPanel" class="output-content">
           <pre id="jsOutput" class="js-output">// the javascript goes here
-// it's probably not pretty</pre>
+// it's probably a lot easier to read</pre>
         </div>
       </div>
     </div>
@@ -904,7 +1048,25 @@ if age tops 17,
 make tracks.`
     };
 
+    // Theme handling
+    const savedTheme = localStorage.getItem('slanglang-theme') || 'brutal';
+    
+    // Apply site theme immediately (before editor exists)
+    document.body.setAttribute('data-theme', savedTheme);
+    
+    function applyTheme(theme) {
+      // Set site theme via data attribute
+      document.body.setAttribute('data-theme', theme);
+      
+      // Set CodeMirror theme (brutal uses our custom CSS, others use CM themes)
+      const cmTheme = theme === 'brutal' ? '' : theme;
+      if (editor) {
+        editor.setOption('theme', cmTheme);
+      }
+    }
+
     // Initialize CodeMirror
+    const cmTheme = savedTheme === 'brutal' ? '' : savedTheme;
     const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
       mode: 'slanglang',
       lineNumbers: true,
@@ -912,10 +1074,21 @@ make tracks.`
       tabSize: 2,
       indentWithTabs: false,
       styleActiveLine: true,
+      theme: cmTheme,
     });
 
     // Load default preset
     editor.setValue(presets.hello);
+
+    // Theme selector
+    const themeSelect = document.getElementById('themeSelect');
+    themeSelect.value = savedTheme;
+    
+    themeSelect.addEventListener('change', (e) => {
+      const theme = e.target.value;
+      applyTheme(theme);
+      localStorage.setItem('slanglang-theme', theme);
+    });
 
     // Preset buttons
     document.querySelectorAll('.preset-btn').forEach(btn => {
