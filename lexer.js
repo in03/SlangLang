@@ -1,21 +1,35 @@
 const moo = require("moo");
 
-// Keywords that act as boundaries for multi-word identifiers
-const BOUNDARY_KEYWORDS = new Set([
-  "prep", "barbie", "with", "crikey", "fair", "go", "serve", "is", "isn't",
-  "bloody", "flamin", "frothin", "spewin", "mate",
-  "esky", "tuckshop", "empty",
-  "scoffin", "dealin", "from", "pass", "the",
-  "til", "fully", "sick", "every", "in",
-  "another", "shrimp", "ditch", "drop", "last", "first", "snag",
-  "sheepshear", "tops", "cops", "up", "grab", "at",
-  "if", "or", "otherwise", "make", "tracks", "equals", "not", "and",
-  "plus", "minus", "times", "dividedby", "then", "friggen",
-  "chuck", "lot", "mates", "call", "it",
-  "bugger", "suss", "gimme",
-  "yeah", "nah", "nothin",
-  "oi", "aussie", "on", "off"
-]);
+// =============================================================================
+// KEYWORD DEFINITIONS - Single source of truth for all SlangLang keywords
+// =============================================================================
+// Categories are used for syntax highlighting. Add new keywords here.
+const KEYWORDS = {
+  control:  ["if", "or", "otherwise", "make", "tracks"],
+  loop:     ["scoffin", "dealin", "pass", "the", "from", "every", "in", "til", "fully", "sick", "full", "got"],
+  function: ["prep", "barbie", "with", "and", "fair", "go", "serve", "on", "off", "howbout"],
+    operator: ["is", "then", "tops", "cops", "equals", "not", "plus", "minus", "times", "dividedby"],
+  type:     ["flamin", "frothin", "spewin", "esky", "tuckshop", "empty"],
+  builtin:  ["crikey", "grab", "at", "chuck", "lot", "mates", "call", "bugger", "suss", "gimme",
+             "another", "shrimp", "ditch", "drop", "last", "first", "snag", "sheepshear", "top", "up", "oi"],
+  literal:  ["yeah", "nah", "nothin"],
+  string:   ["bloody", "mate"],
+  special:  ["isn't", "who's"],  // Keywords with apostrophes (need regex, not kw())
+};
+
+// Flatten all keywords into a single array
+function getAllKeywords() {
+  const all = new Set();
+  for (const category of Object.values(KEYWORDS)) {
+    for (const kw of category) {
+      all.add(kw);
+    }
+  }
+  return Array.from(all).sort();
+}
+
+// Keywords that act as boundaries for multi-word identifiers (exclude apostrophe ones)
+const BOUNDARY_KEYWORDS = new Set(getAllKeywords().filter(k => !k.includes("'")));
 
 // Punctuation that acts as boundaries
 const BOUNDARY_PUNCTUATION = new Set([":", ",", ".", "!", "?", "–"]);
@@ -54,6 +68,7 @@ function createLexer() {
       KW_BLOODY: kw("bloody"),
       KW_FLAMIN: kw("flamin"),
       KW_FROTHIN: kw("frothin"),
+      KW_HOWBOUT: kw("howbout"),
       KW_SPEWIN: kw("spewin"),
       KW_MATE: kw("mate"),
       
@@ -66,7 +81,6 @@ function createLexer() {
       KW_SCOFFIN: kw("scoffin"),
       KW_DEALIN: kw("dealin"),
       KW_SERVE: kw("serve"),
-      KW_FRIGGEN: kw("friggen"),
       KW_THEN: kw("then"),  // Must come before KW_THE!
       KW_THE: kw("the"),
       KW_FROM: kw("from"),
@@ -368,4 +382,7 @@ function createLexer() {
   };
 }
 
+// Export lexer factory and keyword definitions
 module.exports = createLexer;
+module.exports.KEYWORDS = KEYWORDS;
+module.exports.getAllKeywords = getAllKeywords;

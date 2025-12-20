@@ -60,6 +60,7 @@ identword -> %IDENT {% d => d[0].value %}
           | %KW_LAST {% d => "last" %}
           | %KW_FIRST {% d => "first" %}
           | %KW_LOT {% d => "lot" %}
+          | %KW_SHRIMP {% d => "shrimp" %}
 
 multiident -> identword {% d => [d[0]] %}
            | multiident identword {% d => [...d[0], d[1]] %}
@@ -82,18 +83,18 @@ funcdef -> %KW_PREP %IDENT %KW_BARBIE %KW_WITH paramlist block {%
 %}
 
 # New: greet on the barbie:
-funcdef -> %IDENT %KW_ON %KW_THE %KW_BARBIE %COLON block offbarbie:? {% 
-  d => ({ type: "Function", name: d[0].value, params: [], body: d[5] }) 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %COLON block offbarbie:? {% 
+  d => ({ type: "Function", name: d[0], params: [], body: d[5] }) 
 %}
 
 # New: greet on the barbie with a, b:
-funcdef -> %IDENT %KW_ON %KW_THE %KW_BARBIE %KW_WITH commalist %COLON block offbarbie:? {% 
-  d => ({ type: "Function", name: d[0].value, params: d[5], body: d[7] }) 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH commalist %COLON block offbarbie:? {% 
+  d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
 %}
 
 # New: greet on the barbie with a and b:
-funcdef -> %IDENT %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block offbarbie:? {% 
-  d => ({ type: "Function", name: d[0].value, params: d[5], body: d[7] }) 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block offbarbie:? {% 
+  d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
 %}
 
 offbarbie -> %KW_FAIR %KW_GO %DOT {% d => null %}
@@ -220,14 +221,14 @@ funccall -> %IDENT {%
   d => ({ type: "Call", name: d[0].value, args: [] }) 
 %}
 
-# Function call with args: flamin funcname with arg1 and arg2
-funccall -> %KW_FLAMIN %IDENT %KW_WITH arglist {% 
-  d => ({ type: "Call", name: d[1].value, args: d[3] }) 
+# Function call with args: howbout funcname with arg1 and arg2
+funccall -> %KW_HOWBOUT identword %KW_WITH arglist {% 
+  d => ({ type: "Call", name: d[1], args: d[3] }) 
 %}
 
 # Function call as expression
-funccallexpr -> %KW_FLAMIN %IDENT %KW_WITH arglist {% 
-  d => ({ type: "Call", name: d[1].value, args: d[3] }) 
+funccallexpr -> %KW_HOWBOUT identword %KW_WITH arglist {% 
+  d => ({ type: "Call", name: d[1], args: d[3] }) 
 %}
 
 arglist -> expr {% d => [d[0]] %}

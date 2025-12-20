@@ -1,68 +1,22 @@
 #!/usr/bin/env node
 /**
- * Generates syntax highlighting rules from the SlangLang lexer.
+ * Generates syntax highlighting rules from SlangLang lexer.
  * 
  * Usage: node tools/generate-syntax.js
  * 
  * Outputs:
  *   - editor/slanglang.tmLanguage.json (VS Code / TextMate)
  *   - editor/slanglang.hljs.js (Highlight.js)
+ *   - editor/keywords.json (for playground)
+ * 
+ * Keywords are defined in lexer.js - the single source of truth.
  */
 
 const fs = require("fs");
 const path = require("path");
 
-// Read and parse the lexer to extract token definitions
-const lexerPath = path.join(__dirname, "..", "lexer.js");
-const lexerSource = fs.readFileSync(lexerPath, "utf8");
-
-// Extract keyword definitions from lexer
-function extractKeywords(source) {
-  const keywords = {
-    control: [],      // Control flow: if, otherwise, etc.
-    loop: [],         // Loop keywords: scoffin, every, til, etc.
-    function: [],     // Function keywords: prep, barbie, deal, etc.
-    operator: [],     // Operators: plus, minus, biggerthan, etc.
-    type: [],         // Type/data keywords: esky, tuckshop, flamin, etc.
-    builtin: [],      // Built-ins: crikey, grab, chuck, etc.
-    literal: [],      // Literals: yeah, nah, nothin, empty
-    string: [],       // String delimiters: bloody, mate
-    punctuation: [],  // Punctuation tokens
-  };
-
-  // Categorize keywords based on their names/usage
-  const controlFlow = ["if", "or", "otherwise", "make", "tracks"];
-  const loops = ["scoffin", "dealin", "pass", "the", "from", "every", "in", "til", "fully", "sick", "whos", "full", "got"];
-  const functions = ["prep", "barbie", "with", "and", "fair", "go", "deal"];
-  const operators = ["plus", "minus", "times", "dividedby", "biggerthan", "smallerthan", "equals", "not", "is", "isn't"];
-  const types = ["esky", "tuckshop", "flamin", "frothin", "spewin", "empty"];
-  const builtins = ["crikey", "grab", "at", "chuck", "lot", "mates", "call", "bugger", "suss", "gimme", 
-                    "another", "shrimp", "ditch", "drop", "last", "first", "snag", "sheepshear", "top", "up"];
-  const literals = ["yeah", "nah", "nothin"];
-  const stringDelim = ["bloody", "mate"];
-
-  // Extract KW_ definitions
-  const kwRegex = /KW_(\w+):\s*"([^"]+)"/g;
-  let match;
-  while ((match = kwRegex.exec(source)) !== null) {
-    const name = match[1].toLowerCase();
-    const value = match[2];
-    
-    if (controlFlow.includes(value)) keywords.control.push(value);
-    else if (loops.includes(value)) keywords.loop.push(value);
-    else if (functions.includes(value)) keywords.function.push(value);
-    else if (operators.includes(value)) keywords.operator.push(value);
-    else if (types.includes(value)) keywords.type.push(value);
-    else if (builtins.includes(value)) keywords.builtin.push(value);
-    else if (stringDelim.includes(value)) keywords.string.push(value);
-    else keywords.builtin.push(value); // Default to builtin
-  }
-
-  // Add literals
-  keywords.literal = literals;
-
-  return keywords;
-}
+// Import keywords directly from the lexer
+const { KEYWORDS, getAllKeywords } = require("../lexer");
 
 // Generate VS Code TextMate grammar
 function generateTMLanguage(keywords) {
@@ -331,6 +285,14 @@ function generateCSS() {
 `;
 }
 
+// Generate keywords JSON for playground/other tools
+function generateKeywordsJSON() {
+  return JSON.stringify({
+    all: getAllKeywords(),
+    categorized: KEYWORDS
+  }, null, 2);
+}
+
 // Generate VS Code extension package.json
 function generateVSCodePackage() {
   return JSON.stringify({
@@ -379,11 +341,12 @@ function generateLanguageConfig() {
 
 // Main
 function main() {
-  console.log("🎨 Generating syntax highlighting from lexer...\n");
+  console.log("🎨 Generating syntax highlighting from lexer.js...\n");
 
-  const keywords = extractKeywords(lexerSource);
+  // Use KEYWORDS from the imported module
+  const keywords = KEYWORDS;
   
-  console.log("Found keywords:");
+  console.log("Keywords:");
   console.log(`  Control: ${keywords.control.join(", ")}`);
   console.log(`  Loops: ${keywords.loop.join(", ")}`);
   console.log(`  Functions: ${keywords.function.join(", ")}`);
@@ -391,6 +354,8 @@ function main() {
   console.log(`  Types: ${keywords.type.join(", ")}`);
   console.log(`  Built-ins: ${keywords.builtin.join(", ")}`);
   console.log(`  Literals: ${keywords.literal.join(", ")}`);
+  console.log(`  String: ${keywords.string.join(", ")}`);
+  console.log(`  Special: ${keywords.special.join(", ")}`);
   console.log("");
 
   // Ensure output directories exist
@@ -426,6 +391,11 @@ function main() {
   const css = generateCSS();
   fs.writeFileSync(path.join(editorDir, "slanglang.css"), css);
   console.log(`✅ Generated: slanglang.css`);
+
+  // Generate keywords JSON for playground
+  const keywordsJson = generateKeywordsJSON();
+  fs.writeFileSync(path.join(editorDir, "keywords.json"), keywordsJson);
+  console.log(`✅ Generated: keywords.json`);
 
   console.log("\n🎉 Done!");
   console.log("\nRun 'bun run build:vsix' to package and install the VS Code extension.");

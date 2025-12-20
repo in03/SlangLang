@@ -351,7 +351,7 @@ let weight = 2.5;
 * Arithmetic expressions (`plus`, `minus`, `times`, `dividedby`)
 * Comparison expressions (`tops`, `cops`, `equals`, `not equals`)
 * Index/key access (`grab X from Y`)
-* Function calls (`flamin funcname with args`)
+* Function calls (`howbout funcname with args`)
 * Method chaining (`then`)
 * List expressions (`esky: items`)
 * Dictionary expressions (`tuckshop: entries`)
@@ -556,8 +556,8 @@ greet
 **With arguments:**
 
 ```slang
-flamin greet with "Bruce"
-flamin add with 5 and 10
+howbout greet with "Bruce"
+howbout add with 5 and 10
 ```
 
 ---

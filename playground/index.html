@@ -1,673 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SlangLang // yeah nah programming</title>
-  <meta name="description" content="SlangLang - a programming language that's had a few too many. Transpiles Aussie slang to JavaScript.">
-  
-  <!-- Fonts - monospace only, we're not fancy -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
-  <!-- CodeMirror -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-  <!-- CodeMirror Themes -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/solarized-dark.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/nord.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/gruvbox-dark.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/one-dark.min.css">
-  
-  <style>
-    /* Default theme - brutal */
-    :root, [data-theme="brutal"] {
-      --bg: #0a0a0a;
-      --surface: #111;
-      --border: #333;
-      --text: #e0e0e0;
-      --text-dim: #666;
-      --accent: #ffcc00;
-      --accent-dim: #997a00;
-      --green: #00ff88;
-      --red: #ff4444;
-      --blue: #4488ff;
-      --cm-theme: none;
-    }
-
-    /* Dracula */
-    [data-theme="dracula"] {
-      --bg: #282a36;
-      --surface: #21222c;
-      --border: #44475a;
-      --text: #f8f8f2;
-      --text-dim: #6272a4;
-      --accent: #bd93f9;
-      --accent-dim: #6c5ce7;
-      --green: #50fa7b;
-      --red: #ff5555;
-      --blue: #8be9fd;
-    }
-
-    /* Nord */
-    [data-theme="nord"] {
-      --bg: #2e3440;
-      --surface: #3b4252;
-      --border: #4c566a;
-      --text: #eceff4;
-      --text-dim: #7b88a1;
-      --accent: #88c0d0;
-      --accent-dim: #5e81ac;
-      --green: #a3be8c;
-      --red: #bf616a;
-      --blue: #81a1c1;
-    }
-
-    /* Gruvbox */
-    [data-theme="gruvbox-dark"] {
-      --bg: #282828;
-      --surface: #1d2021;
-      --border: #504945;
-      --text: #ebdbb2;
-      --text-dim: #928374;
-      --accent: #fabd2f;
-      --accent-dim: #d79921;
-      --green: #b8bb26;
-      --red: #fb4934;
-      --blue: #83a598;
-    }
-
-    /* Monokai */
-    [data-theme="monokai"] {
-      --bg: #272822;
-      --surface: #1e1f1c;
-      --border: #49483e;
-      --text: #f8f8f2;
-      --text-dim: #75715e;
-      --accent: #f92672;
-      --accent-dim: #ae81ff;
-      --green: #a6e22e;
-      --red: #f92672;
-      --blue: #66d9ef;
-    }
-
-    /* Solarized Dark */
-    [data-theme="solarized-dark"] {
-      --bg: #002b36;
-      --surface: #073642;
-      --border: #586e75;
-      --text: #839496;
-      --text-dim: #657b83;
-      --accent: #b58900;
-      --accent-dim: #cb4b16;
-      --green: #859900;
-      --red: #dc322f;
-      --blue: #268bd2;
-    }
-
-    /* Material Darker */
-    [data-theme="material-darker"] {
-      --bg: #212121;
-      --surface: #303030;
-      --border: #424242;
-      --text: #eeffff;
-      --text-dim: #545454;
-      --accent: #89ddff;
-      --accent-dim: #82aaff;
-      --green: #c3e88d;
-      --red: #f07178;
-      --blue: #82aaff;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'IBM Plex Mono', monospace;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.5;
-      font-size: 14px;
-    }
-
-    /* Header - minimal */
-    header {
-      border-bottom: 2px solid var(--border);
-      padding: 1rem 1.5rem;
-    }
-
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .logo {
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      text-decoration: none;
-      color: var(--text);
-    }
-
-    .logo h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--accent);
-    }
-
-    .logo-tag {
-      color: var(--text-dim);
-      font-size: 0.8rem;
-    }
-
-    .header-links a {
-      color: var(--text-dim);
-      text-decoration: none;
-      padding: 0.4rem 0.8rem;
-      border: 1px solid var(--border);
-      font-size: 0.85rem;
-      transition: all 0.1s;
-    }
-
-    .header-links a:hover {
-      color: var(--text);
-      border-color: var(--text);
-    }
-
-    /* Main Container */
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
-    }
-
-    /* Intro - dry and minimal */
-    .intro {
-      margin-bottom: 2rem;
-      max-width: 600px;
-    }
-
-    .intro h2 {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    .intro p {
-      color: var(--text-dim);
-      font-size: 0.9rem;
-    }
-
-    .intro .disclaimer {
-      margin-top: 1rem;
-      padding: 0.75rem;
-      border-left: 2px solid var(--accent-dim);
-      color: var(--text-dim);
-      font-size: 0.8rem;
-    }
-
-    /* Presets - brutalist buttons */
-    .presets-bar {
-      display: flex;
-      gap: 0;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      border: 2px solid var(--border);
-      width: fit-content;
-    }
-
-    .preset-btn {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-right: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 0.85rem;
-      transition: all 0.1s;
-    }
-
-    .preset-btn:last-child {
-      border-right: none;
-    }
-
-    .preset-btn:hover {
-      background: var(--surface);
-      color: var(--text);
-    }
-
-    .preset-btn.active {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    /* Editor Layout */
-    .playground {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border: 2px solid var(--border);
-    }
-
-    @media (max-width: 800px) {
-      .playground {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .panel {
-      background: var(--surface);
-    }
-
-    .panel:first-child {
-      border-right: 2px solid var(--border);
-    }
-
-    @media (max-width: 800px) {
-      .panel:first-child {
-        border-right: none;
-        border-bottom: 2px solid var(--border);
-      }
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-    }
-
-    .panel-title {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .run-btn {
-      padding: 0.4rem 1rem;
-      background: var(--green);
-      color: var(--bg);
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
-      font-size: 0.85rem;
-      transition: all 0.1s;
-    }
-
-    .run-btn:hover {
-      filter: brightness(1.1);
-    }
-
-    .run-btn:active {
-      filter: brightness(0.9);
-    }
-
-    /* CodeMirror - raw terminal vibes */
-    .CodeMirror {
-      height: 400px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 13px;
-      border: none;
-    }
-
-    .CodeMirror-gutters {
-      border-right: 1px solid var(--border);
-    }
-
-    .CodeMirror-linenumber {
-      color: var(--text-dim);
-    }
-
-    .CodeMirror-cursor {
-      border-left: 2px solid var(--accent);
-    }
-
-    /* Custom syntax highlighting for brutal theme (no CodeMirror theme) */
-    [data-theme="brutal"] .cm-keyword { color: var(--accent); font-weight: 500; }
-    [data-theme="brutal"] .cm-builtin { color: var(--green); font-weight: 500; }
-    [data-theme="brutal"] .cm-string { color: #ff9966; }
-    [data-theme="brutal"] .cm-number { color: var(--blue); }
-    [data-theme="brutal"] .cm-variable { color: var(--text); }
-    [data-theme="brutal"] .cm-comment { color: var(--text-dim); }
-    [data-theme="brutal"] .cm-punctuation { color: var(--accent); }
-
-    [data-theme="brutal"] .CodeMirror {
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    [data-theme="brutal"] .CodeMirror-gutters {
-      background: var(--bg);
-    }
-
-    /* Theme selector */
-    .theme-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .theme-selector label {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .theme-selector select {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.75rem;
-      padding: 0.2rem 0.5rem;
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.3rem center;
-      padding-right: 1.5rem;
-    }
-
-    .theme-selector select:hover {
-      border-color: var(--text);
-    }
-
-    .theme-selector select:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    /* Output */
-    .output {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 13px;
-      padding: 1rem;
-      min-height: 400px;
-      max-height: 400px;
-      overflow-y: auto;
-      background: var(--bg);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .output.error {
-      color: var(--red);
-    }
-
-    .output.success {
-      color: var(--green);
-    }
-
-    .output-placeholder {
-      color: var(--text-dim);
-    }
-
-    /* JS Output */
-    .js-output {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      padding: 1rem;
-      background: var(--bg);
-      color: var(--text-dim);
-      min-height: 400px;
-      max-height: 400px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-    }
-
-    /* Tabs */
-    .output-tabs {
-      display: flex;
-      gap: 0;
-    }
-
-    .output-tab {
-      padding: 0.4rem 0.75rem;
-      background: transparent;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 2px solid transparent;
-      transition: all 0.1s;
-    }
-
-    .output-tab:hover {
-      color: var(--text);
-    }
-
-    .output-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .output-content {
-      display: none;
-    }
-
-    .output-content.active {
-      display: block;
-    }
-
-    /* Footer - minimal */
-    footer {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
-      border-top: 1px solid var(--border);
-      margin-top: 2rem;
-    }
-
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      gap: 2rem;
-    }
-
-    .footer-left {
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      max-width: 400px;
-    }
-
-    .footer-left p {
-      margin-bottom: 0.5rem;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .footer-links a {
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 0.8rem;
-    }
-
-    .footer-links a:hover {
-      color: var(--accent);
-    }
-
-    /* Scrollbar - minimal */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-dim);
-    }
-
-    /* Keyboard hint */
-    .kbd {
-      display: inline-block;
-      padding: 0.1rem 0.4rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    /* Quick Reference Panel */
-    .quickref {
-      margin-top: 1.5rem;
-      border: 2px solid var(--border);
-    }
-
-    .quickref-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.5rem 0.75rem;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .quickref-header:hover {
-      background: var(--surface);
-    }
-
-    .quickref-title {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .quickref-toggle {
-      color: var(--text-dim);
-      font-size: 0.8rem;
-    }
-
-    .quickref-content {
-      display: none;
-      background: var(--surface);
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .quickref.open .quickref-content {
-      display: block;
-    }
-
-    .quickref.open .quickref-toggle::after {
-      content: '▲';
-    }
-
-    .quickref-toggle::after {
-      content: '▼';
-    }
-
-    .quickref-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 0;
-    }
-
-    .quickref-section {
-      padding: 0.75rem 1rem;
-      border-right: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .quickref-section:last-child {
-      border-right: none;
-    }
-
-    .quickref-section h4 {
-      font-size: 0.7rem;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
-    }
-
-    .quickref-item {
-      margin-bottom: 0.4rem;
-      font-size: 0.8rem;
-      line-height: 1.4;
-    }
-
-    .quickref-item code {
-      color: var(--green);
-      background: var(--bg);
-      padding: 0.1rem 0.3rem;
-      font-size: 0.75rem;
-    }
-
-    .quickref-item .arrow {
-      color: var(--text-dim);
-      margin: 0 0.3rem;
-    }
-
-    .quickref-item .desc {
-      color: var(--text-dim);
-    }
-
-    .quickref-table {
-      width: 100%;
-      font-size: 0.75rem;
-      border-collapse: collapse;
-    }
-
-    .quickref-table td {
-      padding: 0.2rem 0;
-    }
-
-    .quickref-table td:first-child {
-      color: var(--green);
-      width: 40%;
-    }
-
-    .quickref-table td:last-child {
-      color: var(--text-dim);
-    }
-
-    @media (max-width: 800px) {
-      .quickref-grid {
-        grid-template-columns: 1fr;
-      }
-      .quickref-section {
-        border-right: none;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlangLang // yeah nah programming</title>
+    <meta name="description" content="SlangLang - a programming language that's had a few too many. Transpiles Aussie slang to JavaScript.">
+    
+    <!-- Fonts - monospace only, we're not fancy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- CodeMirror -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <!-- CodeMirror Themes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/solarized-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/nord.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/gruvbox-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/one-dark.min.css">
+    
+    <style>
+        /* Default theme - brutal */
+        :root, [data-theme="brutal"] {
+            --bg: #0a0a0a;
+            --surface: #111;
+            --border: #333;
+            --text: #e0e0e0;
+            --text-dim: #666;
+            --accent: #ffcc00;
+            --accent-dim: #997a00;
+            --green: #00ff88;
+            --red: #ff4444;
+            --blue: #4488ff;
+            --cm-theme: none;
+        }
+        
+        /* Dracula */
+        [data-theme="dracula"] {
+            --bg: #282a36;
+            --surface: #21222c;
+            --border: #44475a;
+            --text: #f8f8f2;
+            --text-dim: #6272a4;
+            --accent: #bd93f9;
+            --accent-dim: #6c5ce7;
+            --green: #50fa7b;
+            --red: #ff5555;
+            --blue: #8be9fd;
+        }
+        
+        /* Nord */
+        [data-theme="nord"] {
+            --bg: #2e3440;
+            --surface: #3b4252;
+            --border: #4c566a;
+            --text: #eceff4;
+            --text-dim: #7b88a1;
+            --accent: #88c0d0;
+            --accent-dim: #5e81ac;
+            --green: #a3be8c;
+            --red: #bf616a;
+            --blue: #81a1c1;
+        }
+        
+        /* Gruvbox */
+        [data-theme="gruvbox-dark"] {
+            --bg: #282828;
+            --surface: #1d2021;
+            --border: #504945;
+            --text: #ebdbb2;
+            --text-dim: #928374;
+            --accent: #fabd2f;
+            --accent-dim: #d79921;
+            --green: #b8bb26;
+            --red: #fb4934;
+            --blue: #83a598;
+        }
+        
+        /* Monokai */
+        [data-theme="monokai"] {
+            --bg: #272822;
+            --surface: #1e1f1c;
+            --border: #49483e;
+            --text: #f8f8f2;
+            --text-dim: #75715e;
+            --accent: #f92672;
+            --accent-dim: #ae81ff;
+            --green: #a6e22e;
+            --red: #f92672;
+            --blue: #66d9ef;
+        }
+        
+        /* Solarized Dark */
+        [data-theme="solarized-dark"] {
+            --bg: #002b36;
+            --surface: #073642;
+            --border: #586e75;
+            --text: #839496;
+            --text-dim: #657b83;
+            --accent: #b58900;
+            --accent-dim: #cb4b16;
+            --green: #859900;
+            --red: #dc322f;
+            --blue: #268bd2;
+        }
+        
+        /* Material Darker */
+        [data-theme="material-darker"] {
+            --bg: #212121;
+            --surface: #303030;
+            --border: #424242;
+            --text: #eeffff;
+            --text-dim: #545454;
+            --accent: #89ddff;
+            --accent-dim: #82aaff;
+            --green: #c3e88d;
+            --red: #f07178;
+            --blue: #82aaff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        /* Header - minimal */
+        header {
+            border-bottom: 2px solid var(--border);
+            padding: 1rem 1.5rem;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .logo-tag {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+        
+        .rotating-phrases {
+            display: inline-flex;
+            position: relative;
+            vertical-align: baseline;
+            height: 1.25em;
+            overflow: hidden;
+            top: 0em;
+        }
+        
+        .rotating-phrases span {
+            display: block;
+            line-height: 1.25;
+            white-space: nowrap;
+            position: absolute;
+            left: 0;
+            top: 0;
+            animation: pushRotate 18s ease-in-out infinite;
+            transform: translateY(100%);
+        }
+        
+        /* Sizer is invisible, sets width */
+        .rotating-phrases .sizer {
+            position: relative;
+            visibility: hidden;
+            animation: none;
+            transform: none;
+        }
+        
+        .rotating-phrases span:nth-child(2) { animation-delay: 0s; }
+        .rotating-phrases span:nth-child(3) { animation-delay: 3s; }
+        .rotating-phrases span:nth-child(4) { animation-delay: 6s; }
+        .rotating-phrases span:nth-child(5) { animation-delay: 9s; }
+        .rotating-phrases span:nth-child(6) { animation-delay: 12s; }
+        .rotating-phrases span:nth-child(7) { animation-delay: 15s; }
+        
+        @keyframes pushRotate {
+            0% { transform: translateY(-100%); }
+            2%, 14% { transform: translateY(0); }
+            16.67%, 100% { transform: translateY(100%); }
+        }
+        
+        .header-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            transition: all 0.1s;
+        }
+        
+        .header-links a:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+        
+        /* Main Container */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        /* Intro - dry and minimal */
+        .intro {
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+        
+        .intro h2 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        
+        .intro p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        
+        .intro .disclaimer {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-left: 2px solid var(--accent-dim);
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+        
+        /* Presets - brutalist buttons */
+        .presets-bar {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            border: 2px solid var(--border);
+            width: fit-content;
+        }
+        
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-right: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: all 0.1s;
+        }
+        
+        .preset-btn:last-child {
+            border-right: none;
+        }
+        
+        .preset-btn:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+        
+        .preset-btn.active {
+            background: var(--accent);
+            color: var(--bg);
+        }
+        
+        /* Editor Layout */
+        .playground {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border: 2px solid var(--border);
+        }
+        
+        @media (max-width: 800px) {
+            .playground {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: var(--surface);
+        }
+        
+        .panel:first-child {
+            border-right: 2px solid var(--border);
+        }
+        
+        @media (max-width: 800px) {
+            .panel:first-child {
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+        
+        .panel-title {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .run-btn {
+            padding: 0.4rem 1rem;
+            background: var(--green);
+            color: var(--bg);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.1s;
+        }
+        
+        .run-btn:hover {
+            filter: brightness(1.1);
+        }
+        
+        .run-btn:active {
+            filter: brightness(0.9);
+        }
+        
+        /* CodeMirror - raw terminal vibes */
+        .CodeMirror {
+            height: 400px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            border: none;
+        }
+        
+        .CodeMirror-gutters {
+            border-right: 1px solid var(--border);
+        }
+        
+        .CodeMirror-linenumber {
+            color: var(--text-dim);
+        }
+        
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--accent);
+        }
+        
+        /* Custom syntax highlighting for brutal theme (no CodeMirror theme) */
+        [data-theme="brutal"] .cm-keyword { color: var(--accent); font-weight: 500; }
+        [data-theme="brutal"] .cm-builtin { color: var(--green); font-weight: 500; }
+        [data-theme="brutal"] .cm-string { color: #ff9966; }
+        [data-theme="brutal"] .cm-number { color: var(--blue); }
+        [data-theme="brutal"] .cm-variable { color: var(--text); }
+        [data-theme="brutal"] .cm-comment { color: var(--text-dim); }
+        [data-theme="brutal"] .cm-punctuation { color: var(--accent); }
+        
+        [data-theme="brutal"] .CodeMirror {
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        [data-theme="brutal"] .CodeMirror-gutters {
+            background: var(--bg);
+        }
+        
+        /* Theme selector */
+        .theme-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .theme-selector label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .theme-selector select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.3rem center;
+            padding-right: 1.5rem;
+        }
+        
+        .theme-selector select:hover {
+            border-color: var(--text);
+        }
+        
+        .theme-selector select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Output */
+        .output {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            padding: 1rem;
+            min-height: 400px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: var(--bg);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .output.error {
+            color: var(--red);
+        }
+        
+        .output.success {
+            color: var(--green);
+        }
+        
+        .output-placeholder {
+            color: var(--text-dim);
+            display: block;
+        }
+        
+        /* JS Output */
+        .js-output {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            padding: 1rem;
+            background: var(--bg);
+            color: var(--text-dim);
+            min-height: 400px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        /* Tabs */
+        .output-tabs {
+            display: flex;
+            gap: 0;
+        }
+        
+        .output-tab {
+            padding: 0.4rem 0.75rem;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid transparent;
+            transition: all 0.1s;
+        }
+        
+        .output-tab:hover {
+            color: var(--text);
+        }
+        
+        .output-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        
+        .output-content {
+            display: none;
+        }
+        
+        .output-content.active {
+            display: block;
+        }
+        
+        /* Footer - minimal */
+        footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .footer-left {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            max-width: 400px;
+        }
+        
+        .footer-left p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        /* Scrollbar - minimal */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-dim);
+        }
+        
+        /* Keyboard hint */
+        .kbd {
+            display: inline-block;
+            padding: 0.1rem 0.4rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        
+        /* Quick Reference Panel */
+        .quickref {
+            margin-top: 1.5rem;
+            border: 2px solid var(--border);
+        }
+        
+        .quickref-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .quickref-header:hover {
+            background: var(--surface);
+        }
+        
+        .quickref-title {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .quickref-toggle {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+        
+        .quickref-content {
+            display: none;
+            background: var(--surface);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .quickref.open .quickref-content {
+            display: block;
+        }
+        
+        .quickref.open .quickref-toggle::after {
+            content: '▲';
+        }
+        
+        .quickref-toggle::after {
+            content: '▼';
+        }
+        
+        .quickref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0;
+        }
+        
+        .quickref-section {
+            padding: 0.75rem 1rem;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .quickref-section:last-child {
+            border-right: none;
+        }
+        
+        .quickref-section h4 {
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quickref-item {
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .quickref-item code {
+            color: var(--green);
+            background: var(--bg);
+            padding: 0.1rem 0.3rem;
+            font-size: 0.75rem;
+        }
+        
+        .quickref-item .arrow {
+            color: var(--text-dim);
+            margin: 0 0.3rem;
+        }
+        
+        .quickref-item .desc {
+            color: var(--text-dim);
+        }
+        
+        .quickref-table {
+            width: 100%;
+            font-size: 0.75rem;
+            border-collapse: collapse;
+        }
+        
+        .quickref-table td {
+            padding: 0.2rem 0;
+        }
+        
+        .quickref-table td:first-child {
+            color: var(--green);
+            width: 40%;
+        }
+        
+        .quickref-table td:last-child {
+            color: var(--text-dim);
+        }
+        
+        @media (max-width: 800px) {
+            .quickref-grid {
+                grid-template-columns: 1fr;
+            }
+            .quickref-section {
+                border-right: none;
+            }
+        }
+    </style>
 </head>
 <body>
   <header>
@@ -779,16 +821,16 @@
           <div class="quickref-section">
             <h4>functions</h4>
             <div class="quickref-item">
-              <code>greet on the barbie:</code><span class="arrow">→</span><span class="desc">define func</span>
+              <code>x on the barbie:</code><span class="arrow">→</span><span class="desc">define func</span>
             </div>
             <div class="quickref-item">
               <code>... with a, b:</code><span class="arrow">→</span><span class="desc">with params</span>
             </div>
             <div class="quickref-item">
-              <code>deal x plus y</code><span class="arrow">→</span><span class="desc">return value</span>
+              <code>serve x plus y</code><span class="arrow">→</span><span class="desc">return value</span>
             </div>
             <div class="quickref-item">
-              <code>flamin greet with "Bob"</code><span class="arrow">→</span><span class="desc">call func</span>
+              <code>howbout x with "y"</code><span class="arrow">→</span><span class="desc">call func</span>
             </div>
           </div>
 
@@ -808,7 +850,7 @@
           <div class="quickref-section">
             <h4>data structures</h4>
             <div class="quickref-item">
-              <code>esky: bloody a, bloody b.</code><span class="arrow">→</span><span class="desc">list</span>
+              <code>esky: bloody string, flamin 3.</code><span class="arrow">→</span><span class="desc">list</span>
             </div>
             <div class="quickref-item">
               <code>tuckshop: x is 1, y is 2.</code><span class="arrow">→</span><span class="desc">dict</span>
@@ -858,17 +900,8 @@
   <script>
     // SlangLang syntax highlighting mode for CodeMirror
     CodeMirror.defineMode("slanglang", function() {
-      const keywords = new Set([
-        "prep", "barbie", "with", "crikey", "fair", "go", "serve", "is", 
-        "bloody", "flamin", "frothin", "spewin", "mate", "esky", "tuckshop",
-        "empty", "scoffin", "dealin", "from", "pass", "the", "til", "fully",
-        "sick", "every", "in", "another", "shrimp", "ditch", "drop", "last",
-        "first", "snag", "sheepshear", "tops", "cops", "up", "grab", "at",
-        "if", "or", "otherwise", "make", "tracks", "equals", "not", "and",
-        "plus", "minus", "times", "dividedby", "then", "friggen", "chuck", "lot", "mates",
-        "call", "it", "bugger", "suss", "gimme", "yeah", "nah", "nothin",
-        "on", "who's", "full", "got"
-      ]);
+      // Keywords are auto-generated from lexer.js at build time
+      const keywords = new Set([]); // PLACEHOLDER - replaced by build.js
       
       const builtins = new Set(["Crikey", "crikey"]);
       
@@ -972,21 +1005,12 @@ Crikey! bloody g'day mate.
 oi yeah we do double quotes too
 Crikey! "That's not a program, *this* is a program."
 
-oi friggen = concat with automatic space
-name is "Bruce"
-Crikey! "Gday" friggen name friggen "welcome to SlangLang!"
-
 oi method chaining? bloody oath
 suggestion is bloody hands off my pie mate
 chippyslap is suggestion then to upper case
-Crikey! chippyslap
-
-aussie aussie aussie
-Mate this a block comment!
-Better be worth saying...
-oi oi oi`,
-
-      loops: `oi looping through a list
+Crikey! chippyslap`,
+                
+                loops: `oi looping through a list
 
 sangas is esky: bloody ham, bloody cheese, bloody salad.
 
@@ -996,15 +1020,15 @@ scoffin snag from sangas!
 who's full?
 
 oi range loop
-Crikey! bloody Counting... mate.
+Crikey! bloody Counting: mate.
 pass the parcel, 5!
   Crikey! parcel
 who's got it?`,
-
-      functions: `oi functions go on the barbie
+                
+                functions: `oi functions go on the barbie
 
 shrimp on the barbie with oldmate:
-  Crikey! "Careful!" friggen oldmate friggen "Hot!"
+  Crikey! "Careful! " plus oldmate plus ", it's hot!" oi syntax is yuck
   serve yeah
 fair go.
 
@@ -1013,20 +1037,20 @@ add on the barbie with a, b:
 fair go.
 
 oi call em
-flamin shrimp with "sheila"
+howbout shrimp with "sheila"
 
-result is flamin add with 10, 5
+result is howbout add with 10, 5
 Crikey! "10 + 5 ="
 Crikey! result`,
-
-      data: `oi esky = list, tuckshop = dict
+                
+                data: `oi esky = list, tuckshop = dict
 
 goodies is esky: bloody beer, bloody chips, bloody snags.
 Crikey! "In the esky:"
 Crikey! goodies
 
 menu is tuckshop: pies is 5, sauce is bloody tomato mate, drinks is 3.
-Crikey! bloody Menu... Mate."
+Crikey! bloody Menu: Mate.
 Crikey! menu
 
 oi iterate the dict
@@ -1035,8 +1059,8 @@ dealin from menu!
   Crikey! item
   Crikey! price
 who's full?`,
-
-      conditions: `oi conditionals
+                
+                conditions: `oi conditionals
 
 score is 85
 
@@ -1055,96 +1079,98 @@ age is 21
 if age tops 17,
   Crikey! "Can drink"
 make tracks.`
-    };
-
-    // Theme handling
-    const savedTheme = localStorage.getItem('slanglang-theme') || 'brutal';
+            };
+            
+            // Theme handling
+            const savedTheme = localStorage.getItem('slanglang-theme') || 'brutal';
+            
+            // Apply site theme immediately (before editor exists)
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            function applyTheme(theme) {
+                // Set site theme via data attribute
+                document.body.setAttribute('data-theme', theme);
+                
+                // Set CodeMirror theme (brutal uses our custom CSS, others use CM themes)
+                const cmTheme = theme === 'brutal' ? '' : theme;
+                if (editor) {
+                    editor.setOption('theme', cmTheme);
+                }
+            }
+            
+            // Initialize CodeMirror
+            const cmTheme = savedTheme === 'brutal' ? '' : savedTheme;
+            const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+                mode: 'slanglang',
+                lineNumbers: true,
+                lineWrapping: true,
+                tabSize: 2,
+                indentWithTabs: false,
+                styleActiveLine: true,
+                theme: cmTheme,
+            });
+            
+            // Load default preset
+            editor.setValue(presets.hello);
+            
+            // Theme selector
+            const themeSelect = document.getElementById('themeSelect');
+            themeSelect.value = savedTheme;
+            
+            themeSelect.addEventListener('change', (e) => {
+                const theme = e.target.value;
+                applyTheme(theme);
+                localStorage.setItem('slanglang-theme', theme);
+            });
+            
+            // Preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    editor.setValue(presets[btn.dataset.preset]);
+                    document.getElementById('output').innerHTML = '<span class="output-placeholder">// hit run or press <span class="kbd">ctrl</span>+<span class="kbd">enter</span></span>';
+                    document.getElementById('jsOutput').textContent = '// the javascript goes here\n// it\'s probably not pretty';
+                });
+            });
+            
+            // Tab switching
+            document.querySelectorAll('.output-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.output-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + 'Panel').classList.add('active');
+                });
+            });
+            
+            // Run button
+            document.getElementById('runBtn').addEventListener('click', () => {
+                const code = editor.getValue();
+                const outputEl = document.getElementById('output');
+                const jsOutputEl = document.getElementById('jsOutput');
+                
+                try {
+                    const result = window.SlangLang.run(code);
+                    outputEl.className = 'output success';
+                    outputEl.textContent = result.output || '// no output';
+                    jsOutputEl.textContent = result.js;
+                } catch (err) {
+                    outputEl.className = 'output error';
+                    outputEl.textContent = '// error: ' + err.message;
+                    jsOutputEl.textContent = '// compilation failed\n// ' + err.message;
+                }
+            });
+            
+            // Keyboard shortcut
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('runBtn').click();
+                }
+            });
+            
+        </script>
+    </body>
+    </html>
     
-    // Apply site theme immediately (before editor exists)
-    document.body.setAttribute('data-theme', savedTheme);
-    
-    function applyTheme(theme) {
-      // Set site theme via data attribute
-      document.body.setAttribute('data-theme', theme);
-      
-      // Set CodeMirror theme (brutal uses our custom CSS, others use CM themes)
-      const cmTheme = theme === 'brutal' ? '' : theme;
-      if (editor) {
-        editor.setOption('theme', cmTheme);
-      }
-    }
-
-    // Initialize CodeMirror
-    const cmTheme = savedTheme === 'brutal' ? '' : savedTheme;
-    const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-      mode: 'slanglang',
-      lineNumbers: true,
-      lineWrapping: true,
-      tabSize: 2,
-      indentWithTabs: false,
-      styleActiveLine: true,
-      theme: cmTheme,
-    });
-
-    // Load default preset
-    editor.setValue(presets.hello);
-
-    // Theme selector
-    const themeSelect = document.getElementById('themeSelect');
-    themeSelect.value = savedTheme;
-    
-    themeSelect.addEventListener('change', (e) => {
-      const theme = e.target.value;
-      applyTheme(theme);
-      localStorage.setItem('slanglang-theme', theme);
-    });
-
-    // Preset buttons
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        editor.setValue(presets[btn.dataset.preset]);
-        document.getElementById('output').innerHTML = '<span class="output-placeholder">// hit run or press <span class="kbd">ctrl</span>+<span class="kbd">enter</span></span>';
-        document.getElementById('jsOutput').textContent = '// the javascript goes here\n// it\'s probably not pretty';
-      });
-    });
-
-    // Tab switching
-    document.querySelectorAll('.output-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.output-content').forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab + 'Panel').classList.add('active');
-      });
-    });
-
-    // Run button
-    document.getElementById('runBtn').addEventListener('click', () => {
-      const code = editor.getValue();
-      const outputEl = document.getElementById('output');
-      const jsOutputEl = document.getElementById('jsOutput');
-      
-      try {
-        const result = window.SlangLang.run(code);
-        outputEl.className = 'output success';
-        outputEl.textContent = result.output || '// no output';
-        jsOutputEl.textContent = result.js;
-      } catch (err) {
-        outputEl.className = 'output error';
-        outputEl.textContent = '// error: ' + err.message;
-        jsOutputEl.textContent = '// compilation failed\n// ' + err.message;
-      }
-    });
-
-    // Keyboard shortcut
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('runBtn').click();
-      }
-    });
-  </script>
-</body>
-</html>

@@ -101,7 +101,7 @@
       "patterns": [
         {
           "name": "keyword.operator.slang",
-          "match": "\\b()\\b"
+          "match": "\\b(is|then|tops|cops|equals|not|plus|minus|times|dividedby)\\b"
         },
         {
           "name": "keyword.operator.slang",
@@ -117,7 +117,7 @@
       "patterns": [
         {
           "name": "keyword.other.slang",
-          "match": "\\b()\\b"
+          "match": "\\b(crikey|grab|at|chuck|lot|mates|call|bugger|suss|gimme|another|shrimp|ditch|drop|last|first|snag|sheepshear|top|up|oi)\\b"
         }
       ]
     },
@@ -125,7 +125,7 @@
       "patterns": [
         {
           "name": "keyword.control.slang",
-          "match": "\\b()\\b"
+          "match": "\\b(if|or|otherwise|make|tracks|scoffin|dealin|pass|the|from|every|in|til|fully|sick|full|got)\\b"
         },
         {
           "name": "keyword.control.loop-end.slang",
@@ -137,7 +137,7 @@
       "patterns": [
         {
           "name": "keyword.function.slang",
-          "match": "\\b()\\b"
+          "match": "\\b(prep|barbie|with|and|fair|go|serve|on|off|howbout)\\b"
         },
         {
           "name": "entity.name.function.slang",
@@ -157,7 +157,7 @@
       "patterns": [
         {
           "name": "storage.type.slang",
-          "match": "\\b()\\b"
+          "match": "\\b(flamin|frothin|spewin|esky|tuckshop|empty)\\b"
         }
       ]
     },

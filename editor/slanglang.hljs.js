@@ -4,13 +4,13 @@
  */
 export default function(hljs) {
   const KEYWORDS = {
-    keyword: '',
-    built_in: '',
-    type: '',
+    keyword: 'if or otherwise make tracks scoffin dealin pass the from every in til fully sick full got prep barbie with and fair go serve on off howbout',
+    built_in: 'crikey grab at chuck lot mates call bugger suss gimme another shrimp ditch drop last first snag sheepshear top up oi',
+    type: 'flamin frothin spewin esky tuckshop empty',
     literal: 'yeah nah nothin empty',
   };
 
-  const OPERATORS = '';
+  const OPERATORS = 'is then tops cops equals not plus minus times dividedby';
 
   const SLANG_STRING = {
     className: 'string',

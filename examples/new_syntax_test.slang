@@ -23,11 +23,11 @@ oi Test friggen (string concat with space)
 Crikey! "Gday" friggen "mate" friggen "welcome!"
 
 oi Call the functions
-flamin greet with "Bruce"
-result is flamin add with 5 and 3
+howbout greet with "Bruce"
+result is howbout add with 5 and 3
 Crikey! result
 
-product is flamin multiply with 4 and 7
+product is howbout multiply with 4 and 7
 Crikey! product
 
 oi Test optional loop terminators

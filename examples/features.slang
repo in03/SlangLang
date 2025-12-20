@@ -63,7 +63,7 @@ greet on the barbie with name:
   serve yeah
 fair go.
 
-flamin greet with "Bruce"
+howbout greet with "Bruce"
 
 Crikey! "--- Friggen (String Concat with Space) ---"
 Crikey! "Hello" friggen "world" friggen "mate!"

@@ -45,6 +45,15 @@ function genExpr(expr) {
     case "DictExpr":
       const entries = expr.entries.map(([k, v]) => `${JSON.stringify(k)}: ${genExpr(v)}`).join(", ");
       return `{${entries}}`;
+    case "TemplateString":
+      // Template string with reckon interpolation: parts = [{type:"string",value:"..."}, {type:"var",name:"x"}, ...]
+      // Compiles to JS template literal: `str1${x}str2`
+      const templateParts = expr.parts.map(part => {
+        if (part.type === "string") return part.value.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+        if (part.type === "var") return `\${${part.name}}`;
+        return '';
+      });
+      return '`' + templateParts.join('') + '`';
     default:
       throw new Error("Unknown expr: " + JSON.stringify(expr));
   }
