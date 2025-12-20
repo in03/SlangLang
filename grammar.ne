@@ -96,7 +96,7 @@ funcdef -> %IDENT %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block offb
   d => ({ type: "Function", name: d[0].value, params: d[5], body: d[7] }) 
 %}
 
-offbarbie -> %KW_OFF %KW_THE %KW_BARBIE %DOT {% d => null %}
+offbarbie -> %KW_FAIR %KW_GO %DOT {% d => null %}
 
 commalist -> multiident {% d => [joinIdent(d[0])] %}
           | commalist %COMMA multiident {% d => [...d[0], joinIdent(d[2])] %}
@@ -106,13 +106,8 @@ paramlist -> multiident {% d => [joinIdent(d[0])] %}
           | paramlist %KW_AND multiident {% d => [...d[0], joinIdent(d[2])] %}
 
 # ============ RETURN ============
-# fair go <expr>
-returnstmt -> %KW_FAIR %KW_GO expr {% 
-  d => ({ type: "Return", value: d[2] }) 
-%}
-
-# deal <expr>
-returnstmt -> %KW_DEAL expr {% 
+# serve <expr>
+returnstmt -> %KW_SERVE expr {% 
   d => ({ type: "Return", value: d[1] }) 
 %}
 
@@ -131,6 +126,7 @@ compareexpr -> addexpr {% id %}
 addexpr -> mulexpr {% id %}
         | addexpr %KW_PLUS mulexpr {% d => ({ type: "BinOp", op: "+", left: d[0], right: d[2] }) %}
         | addexpr %KW_MINUS mulexpr {% d => ({ type: "BinOp", op: "-", left: d[0], right: d[2] }) %}
+        | addexpr %KW_FRIGGEN mulexpr {% d => ({ type: "Concat", left: d[0], right: d[2] }) %}
 
 mulexpr -> unaryexpr {% id %}
         | mulexpr %KW_TIMES unaryexpr {% d => ({ type: "BinOp", op: "*", left: d[0], right: d[2] }) %}

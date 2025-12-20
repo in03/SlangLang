@@ -2,7 +2,7 @@ const moo = require("moo");
 
 // Keywords that act as boundaries for multi-word identifiers
 const BOUNDARY_KEYWORDS = new Set([
-  "prep", "barbie", "with", "crikey", "fair", "go", "deal", "is", "isn't",
+  "prep", "barbie", "with", "crikey", "fair", "go", "serve", "is", "isn't",
   "bloody", "flamin", "frothin", "spewin", "mate",
   "esky", "tuckshop", "empty",
   "scoffin", "dealin", "from", "pass", "the",
@@ -10,7 +10,7 @@ const BOUNDARY_KEYWORDS = new Set([
   "another", "shrimp", "ditch", "drop", "last", "first", "snag",
   "sheepshear", "tops", "cops", "up", "grab", "at",
   "if", "or", "otherwise", "make", "tracks", "equals", "not", "and",
-  "plus", "minus", "times", "dividedby", "then",
+  "plus", "minus", "times", "dividedby", "then", "friggen",
   "chuck", "lot", "mates", "call", "it",
   "bugger", "suss", "gimme",
   "yeah", "nah", "nothin",
@@ -65,7 +65,8 @@ function createLexer() {
       // Loop keywords
       KW_SCOFFIN: kw("scoffin"),
       KW_DEALIN: kw("dealin"),
-      KW_DEAL: kw("deal"),
+      KW_SERVE: kw("serve"),
+      KW_FRIGGEN: kw("friggen"),
       KW_THEN: kw("then"),  // Must come before KW_THE!
       KW_THE: kw("the"),
       KW_FROM: kw("from"),

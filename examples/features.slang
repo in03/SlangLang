@@ -58,11 +58,15 @@ Crikey! 5 is 5
 Crikey! 5 isn't 3
 
 Crikey! "--- Functions with Parameters ---"
-prep greet barbie with name
+greet on the barbie with name:
   Crikey! name
-  deal yeah
+  serve yeah
+fair go.
 
 flamin greet with "Bruce"
+
+Crikey! "--- Friggen (String Concat with Space) ---"
+Crikey! "Hello" friggen "world" friggen "mate!"
 
 Crikey! grab 0 from sangas
 Crikey! grab bloody pies mate from menu

@@ -78,15 +78,12 @@ var grammar = {
     {"name": "funcdef", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "paramlist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block", "funcdef$ebnf$3"], "postprocess":  
         d => ({ type: "Function", name: d[0].value, params: d[5], body: d[7] }) 
         },
-    {"name": "offbarbie", "symbols": [(lexer.has("KW_OFF") ? {type: "KW_OFF"} : KW_OFF), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": d => null},
+    {"name": "offbarbie", "symbols": [(lexer.has("KW_FAIR") ? {type: "KW_FAIR"} : KW_FAIR), (lexer.has("KW_GO") ? {type: "KW_GO"} : KW_GO), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": d => null},
     {"name": "commalist", "symbols": ["multiident"], "postprocess": d => [joinIdent(d[0])]},
     {"name": "commalist", "symbols": ["commalist", (lexer.has("COMMA") ? {type: "COMMA"} : COMMA), "multiident"], "postprocess": d => [...d[0], joinIdent(d[2])]},
     {"name": "paramlist", "symbols": ["multiident"], "postprocess": d => [joinIdent(d[0])]},
     {"name": "paramlist", "symbols": ["paramlist", (lexer.has("KW_AND") ? {type: "KW_AND"} : KW_AND), "multiident"], "postprocess": d => [...d[0], joinIdent(d[2])]},
-    {"name": "returnstmt", "symbols": [(lexer.has("KW_FAIR") ? {type: "KW_FAIR"} : KW_FAIR), (lexer.has("KW_GO") ? {type: "KW_GO"} : KW_GO), "expr"], "postprocess":  
-        d => ({ type: "Return", value: d[2] }) 
-        },
-    {"name": "returnstmt", "symbols": [(lexer.has("KW_DEAL") ? {type: "KW_DEAL"} : KW_DEAL), "expr"], "postprocess":  
+    {"name": "returnstmt", "symbols": [(lexer.has("KW_SERVE") ? {type: "KW_SERVE"} : KW_SERVE), "expr"], "postprocess":  
         d => ({ type: "Return", value: d[1] }) 
         },
     {"name": "expr", "symbols": ["compareexpr"], "postprocess": id},
@@ -101,6 +98,7 @@ var grammar = {
     {"name": "addexpr", "symbols": ["mulexpr"], "postprocess": id},
     {"name": "addexpr", "symbols": ["addexpr", (lexer.has("KW_PLUS") ? {type: "KW_PLUS"} : KW_PLUS), "mulexpr"], "postprocess": d => ({ type: "BinOp", op: "+", left: d[0], right: d[2] })},
     {"name": "addexpr", "symbols": ["addexpr", (lexer.has("KW_MINUS") ? {type: "KW_MINUS"} : KW_MINUS), "mulexpr"], "postprocess": d => ({ type: "BinOp", op: "-", left: d[0], right: d[2] })},
+    {"name": "addexpr", "symbols": ["addexpr", (lexer.has("KW_FRIGGEN") ? {type: "KW_FRIGGEN"} : KW_FRIGGEN), "mulexpr"], "postprocess": d => ({ type: "Concat", left: d[0], right: d[2] })},
     {"name": "mulexpr", "symbols": ["unaryexpr"], "postprocess": id},
     {"name": "mulexpr", "symbols": ["mulexpr", (lexer.has("KW_TIMES") ? {type: "KW_TIMES"} : KW_TIMES), "unaryexpr"], "postprocess": d => ({ type: "BinOp", op: "*", left: d[0], right: d[2] })},
     {"name": "mulexpr", "symbols": ["mulexpr", (lexer.has("KW_DIVIDEDBY") ? {type: "KW_DIVIDEDBY"} : KW_DIVIDEDBY), "unaryexpr"], "postprocess": d => ({ type: "BinOp", op: "/", left: d[0], right: d[2] })},

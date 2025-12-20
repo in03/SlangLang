@@ -138,13 +138,13 @@ oi oi oi
 | `oi oi oi`      | Block comment close            |
 | `prep`          | Function definition keyword (legacy) |
 | `on`            | Function definition (new syntax) |
-| `off`           | Function terminator (new syntax) |
 | `barbie`        | Function body start marker     |
 | `with`          | Parameter list start           |
 | `and`           | Parameter/argument separator   |
 | `crikey`        | Print keyword (use with `!`)   |
-| `fair` `go`     | Return keyword pair            |
-| `deal`          | Return keyword (alternative)   |
+| `serve`         | Return keyword                 |
+| `fair` `go`     | Function block terminator      |
+| `friggen`       | String concat with space       |
 | `yeah`          | Boolean true                   |
 | `nah`           | Boolean false                  |
 | `nothin`        | Null literal                   |
@@ -419,6 +419,24 @@ console.log(clean);  // "HELLO WORLD"
 
 Note: `plus` works on both numbers and strings (uses JS `+` operator).
 
+### String Concatenation with Space
+
+The `friggen` keyword concatenates strings with an automatic space between them:
+
+```slang
+name is "Bruce"
+Crikey! "Gday" friggen name friggen "welcome!"
+```
+
+Compiles to:
+
+```js
+let name = "Bruce";
+console.log("Gday" + " " + name + " " + "welcome!");  // "Gday Bruce welcome!"
+```
+
+This is perfect for building natural sentences without manually adding spaces.
+
 ### Comparison Operators
 
 | Slang         | JS    | Example                |
@@ -460,15 +478,13 @@ Crikey! x plus y
 
 ### Return Statement
 
-Two forms supported:
-
 ```slang
-fair go yeah
-deal result
+serve result
 ```
 
 * Must appear inside a function
 * Compiles to JS `return`
+* Fits the "barbie" theme — you cook it, then serve it!
 
 ---
 
@@ -483,16 +499,16 @@ The preferred way to define functions uses the "on the barbie" syntax:
 ```slang
 greet on the barbie:
   Crikey! "gday"
-  fair go yeah
-off the barbie.
+  serve yeah
+fair go.
 ```
 
 **With comma-separated parameters:**
 
 ```slang
 add on the barbie with a, b:
-  deal a plus b
-off the barbie.
+  serve a plus b
+fair go.
 ```
 
 **With `and`-separated parameters:**
@@ -500,7 +516,7 @@ off the barbie.
 ```slang
 greet on the barbie with name and age:
   Crikey! name
-  deal yeah
+  serve yeah
 ```
 
 **With indented parameter list:**
@@ -511,10 +527,10 @@ calculate on the barbie with
   second value
   multiplier
 :
-  deal first value times second value times multiplier
+  serve first value times second value times multiplier
 ```
 
-The `off the barbie.` terminator is **optional** when indentation is clear.
+The `fair go.` terminator is **optional** when indentation is clear.
 
 ### Function Definition (Legacy Syntax)
 
@@ -523,10 +539,10 @@ The original `prep ... barbie` syntax is still supported:
 ```slang
 prep greet barbie
   Crikey! "gday"
-  fair go yeah
+  serve yeah
 
 prep add barbie with a and b
-  deal a plus b
+  serve a plus b
 ```
 
 ### Function Calls
@@ -884,7 +900,8 @@ Planned enhancements:
 * ✅ Function parameters (with...and)
 * ✅ Exception handling (bugger, suss)
 * ✅ Spewin as float/length keyword
-* ✅ Deal as return alternative
+* ✅ Serve as return keyword
+* ✅ Friggen for string concatenation with space
 * ✅ Multi-word identifier support
 * ✅ Comments (oi line, aussie aussie aussie block)
 * ✅ New function syntax (on the barbie)

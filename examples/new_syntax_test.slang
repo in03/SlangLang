@@ -9,15 +9,18 @@ oi Test the new function syntax
 
 greet on the barbie with name:
   Crikey! name
-off the barbie.
+fair go.
 
 oi Test without terminator
 add on the barbie with a, b:
-  deal a plus b
+  serve a plus b
 
 oi Test with 'and' separator
 multiply on the barbie with x and y:
-  deal x times y
+  serve x times y
+
+oi Test friggen (string concat with space)
+Crikey! "Gday" friggen "mate" friggen "welcome!"
 
 oi Call the functions
 flamin greet with "Bruce"

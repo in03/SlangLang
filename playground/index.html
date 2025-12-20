@@ -685,9 +685,9 @@
   <main>
     <section class="intro">
       <h2>yeah nah, it's a programming language</h2>
-      <p>If a line of SlangLang can't be read aloud in an Australian accent without embarrassment, it probably violates the spec...</p>
+      <p>Slanglang is a quirky <a href="https://esolangs.org/wiki/Main_Page" target="_blank" rel="noopener">esolang</a> that reads like your mate who's had one too many and writes about the same.</p>
       <div class="disclaimer">
-        ⚠️ This is a joke that got out of hand. Don't use it for anything important.
+        ⚠️ In all seriousness, you probably shouldn't use this for anything important.
       </div>
     </section>
 
@@ -841,7 +841,7 @@
   <footer>
     <div class="footer-content">
       <div class="footer-left">
-        <p>made for kicks and giggles</p>
+        <p>made for kicks and giggles 🦵🤭</p>
         <p>by <a href="https://calebtrevatt.com" target="_blank">@caleb.trevatt</a></p>
       </div>
       <div class="footer-links">
@@ -859,15 +859,15 @@
     // SlangLang syntax highlighting mode for CodeMirror
     CodeMirror.defineMode("slanglang", function() {
       const keywords = new Set([
-        "prep", "barbie", "with", "crikey", "fair", "go", "deal", "is", 
+        "prep", "barbie", "with", "crikey", "fair", "go", "serve", "is", 
         "bloody", "flamin", "frothin", "spewin", "mate", "esky", "tuckshop",
         "empty", "scoffin", "dealin", "from", "pass", "the", "til", "fully",
         "sick", "every", "in", "another", "shrimp", "ditch", "drop", "last",
         "first", "snag", "sheepshear", "tops", "cops", "up", "grab", "at",
         "if", "or", "otherwise", "make", "tracks", "equals", "not", "and",
-        "plus", "minus", "times", "dividedby", "then", "chuck", "lot", "mates",
+        "plus", "minus", "times", "dividedby", "then", "friggen", "chuck", "lot", "mates",
         "call", "it", "bugger", "suss", "gimme", "yeah", "nah", "nothin",
-        "on", "off", "who's", "full", "got"
+        "on", "who's", "full", "got"
       ]);
       
       const builtins = new Set(["Crikey", "crikey"]);
@@ -966,45 +966,54 @@
     const presets = {
       hello: `oi this is a comment. g'day.
 
-Crikey! "Hello, World!"
-Crikey! "Welcome to SlangLang"
+oi 'bloody ... mate' string literals
+Crikey! bloody g'day mate.
 
-name is bloody Bruce mate
-Crikey! name
+oi yeah we do double quotes too
+Crikey! "That's not a program, *this* is a program."
 
-oi method chaining? yeah we got that
-greeting is bloody gday bruce mate
-result is greeting then to upper case
-Crikey! result`,
+oi friggen = concat with automatic space
+name is "Bruce"
+Crikey! "Gday" friggen name friggen "welcome to SlangLang!"
+
+oi method chaining? bloody oath
+suggestion is bloody hands off my pie mate
+chippyslap is suggestion then to upper case
+Crikey! chippyslap
+
+aussie aussie aussie
+Mate this a block comment!
+Better be worth saying...
+oi oi oi`,
 
       loops: `oi looping through a list
 
 sangas is esky: bloody ham, bloody cheese, bloody salad.
 
-Crikey! "What's in the esky?"
+Crikey! bloody What's in the esky? mate.
 scoffin snag from sangas!
   Crikey! snag
 who's full?
 
 oi range loop
-Crikey! "Counting..."
-pass the chips, 5!
-  Crikey! chips
+Crikey! bloody Counting... mate.
+pass the parcel, 5!
+  Crikey! parcel
 who's got it?`,
 
       functions: `oi functions go on the barbie
 
-greet on the barbie with name:
-  Crikey! "G'day,"
-  Crikey! name
-off the barbie.
+shrimp on the barbie with oldmate:
+  Crikey! "Careful!" friggen oldmate friggen "Hot!"
+  serve yeah
+fair go.
 
 add on the barbie with a, b:
-  deal a plus b
-off the barbie.
+  serve a plus b
+fair go.
 
 oi call em
-flamin greet with "Bruce"
+flamin shrimp with "sheila"
 
 result is flamin add with 10, 5
 Crikey! "10 + 5 ="
@@ -1017,7 +1026,7 @@ Crikey! "In the esky:"
 Crikey! goodies
 
 menu is tuckshop: pies is 5, sauce is bloody tomato mate, drinks is 3.
-Crikey! "Menu:"
+Crikey! bloody Menu... Mate."
 Crikey! menu
 
 oi iterate the dict
