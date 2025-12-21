@@ -1075,17 +1075,17 @@
         <span class="ai-generator-title">AI Code Generator</span>
         <div class="ai-auth-status" style="display: none;">
           <span id="authStatus" class="auth-status-text">Not authenticated</span>
-          <button id="authBtn" class="auth-btn">Login with GitHub</button>
+          <button id="authBtn" class="auth-btn" type="button">Login with GitHub</button>
         </div>
       </div>
       <div class="ai-generator-content">
         <div class="ai-input-group">
           <input type="text" id="aiPrompt" class="ai-prompt-input" placeholder="e.g. calculate fibonacci numbers" disabled>
-          <button id="generateBtn" class="generate-btn" disabled>Send It</button>
+          <button id="generateBtn" class="generate-btn" type="button" disabled>Send It</button>
           <div id="userAvatar" class="user-avatar" style="display: none;">
             <img id="userAvatarImg" class="user-avatar-img" src="" alt="User avatar">
             <div id="userMenu" class="user-menu">
-              <button id="signOutBtn" class="user-menu-item">Sign Out</button>
+              <button id="signOutBtn" class="user-menu-item" type="button">Sign Out</button>
             </div>
           </div>
         </div>
@@ -1100,7 +1100,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>🤖 GitHub Models Access</h3>
-          <button id="closeModal" class="modal-close">&times;</button>
+          <button id="closeModal" class="modal-close" type="button">&times;</button>
         </div>
         <div class="modal-body">
           <p>To use the AI code generator powered by GitHub Models, you'll need to sign in with your GitHub account.</p>
@@ -1113,8 +1113,8 @@
           <p><small>This uses GitHub's OAuth and requires minimal permissions for AI model access.</small></p>
         </div>
         <div class="modal-footer">
-          <button id="cancelAuth" class="modal-btn modal-btn-secondary">Maybe Later</button>
-          <button id="confirmAuth" class="modal-btn modal-btn-primary">
+          <button id="cancelAuth" class="modal-btn modal-btn-secondary" type="button">Maybe Later</button>
+          <button id="confirmAuth" class="modal-btn modal-btn-primary" type="button">
             <span class="github-icon">🐙</span>
             Sign in with GitHub
           </button>
