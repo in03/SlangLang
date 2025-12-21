@@ -1561,6 +1561,7 @@ make tracks.`
                     this.specContent = null;
                     this.isAuthenticated = false;
                     this.clientId = null; // Will be set from environment or config
+                    this.pendingPrompt = null; // Store prompt when showing auth modal
 
                     this.init();
                 }
@@ -1656,6 +1657,9 @@ make tracks.`
                 }
 
                 showAuthModal() {
+                    // Store the current prompt before showing auth modal
+                    const promptInput = document.getElementById('aiPrompt');
+                    this.pendingPrompt = promptInput.value.trim();
                     document.getElementById('authModal').classList.add('show');
                 }
 
@@ -1794,6 +1798,14 @@ make tracks.`
                             localStorage.setItem('slanglang-github-token-expiry', expiry.toString());
 
                             this.updateAuthUI();
+
+                            // Auto-generate if there's a pending prompt from before auth
+                            if (this.pendingPrompt) {
+                                const pendingPrompt = this.pendingPrompt;
+                                this.pendingPrompt = null; // Clear it
+                                // Small delay to let UI update first
+                                setTimeout(() => this.generateCode(pendingPrompt), 500);
+                            }
                         } else {
                             console.error('Failed to get access token:', data);
                             alert('Authentication failed. Please try again.');
@@ -1914,8 +1926,8 @@ make tracks.`
                     // Clear authentication data
                     this.githubToken = null;
                     this.isAuthenticated = false;
-                    localStorage.removeItem('github-token');
-                    localStorage.removeItem('github-token-expiry');
+                    localStorage.removeItem('slanglang-github-token');
+                    localStorage.removeItem('slanglang-github-token-expiry');
 
                     // Update UI
                     this.updateAuthUI();
@@ -1925,8 +1937,8 @@ make tracks.`
                     userAvatarImg.src = '';
                 }
 
-                async generateCode() {
-                    const prompt = document.getElementById('aiPrompt').value.trim();
+                async generateCode(promptText = null) {
+                    const prompt = promptText || document.getElementById('aiPrompt').value.trim();
                     if (!prompt) return;
 
                     const generateBtn = document.getElementById('generateBtn');
