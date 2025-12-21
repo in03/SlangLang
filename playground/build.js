@@ -63,7 +63,13 @@ console.log('✅ Bundled compiler');
 copyFileSync('./editor/slanglang.hljs.js', './playground/dist/slanglang.hljs.js');
 copyFileSync('./editor/slanglang.css', './playground/dist/slanglang.css');
 
-console.log('✅ Copied syntax highlighting');
+// Copy spec.md for AI context
+copyFileSync('./spec.md', './playground/dist/spec.md');
+
+// Copy config.js for OAuth setup
+copyFileSync('./playground/config.js', './playground/dist/config.js');
+
+console.log('✅ Copied syntax highlighting, spec.md, and config.js');
 
 // Process HTML - inject auto-generated keywords
 let html = readFileSync('./playground/index.html', 'utf8');

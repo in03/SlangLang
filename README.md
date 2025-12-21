@@ -11,6 +11,25 @@ bun link
 aussie examples/demo.slang
 ```
 
+## Playground
+
+Try SlangLang in your browser with an interactive playground featuring AI-powered code generation:
+
+```bash
+bun run build:playground
+# Then open playground/dist/index.html
+```
+
+The playground includes:
+- **AI Code Generator**: Generate custom SlangLang code using GitHub Models API
+- **Interactive Editor**: Write and run SlangLang code with syntax highlighting
+- **GitHub OAuth**: Sign in to access AI features powered by GitHub Models
+- **Compilation View**: See your SlangLang code transpiled to JavaScript
+
+**Setup GitHub OAuth** for AI features: See `playground/OAUTH_SETUP.md`
+
+> **Security Note**: The playground uses client-side OAuth which is secure for this use case but stores tokens in localStorage. For high-security applications, consider server-side OAuth implementation.
+
 ## Syntax
 
 ### Variables
