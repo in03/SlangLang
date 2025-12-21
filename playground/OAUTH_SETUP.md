@@ -14,9 +14,9 @@ This guide will help you set up GitHub OAuth for the AI code generator feature.
    - **Application name**: `SlangLang Playground` (or whatever you prefer)
    - **Homepage URL**: Your deployment URL (e.g., `https://yourusername.github.io/slanglang` or `https://slanglang.vercel.app`)
    - **Application description**: `AI-powered code generator for SlangLang`
-   - **Authorization callback URL**: Your base domain (e.g., `https://yourusername.github.io` or `https://slanglang.vercel.app`)
+   - **Authorization callback URL**: Your playground URL (e.g., `https://yourusername.github.io/slanglang/` or `https://slanglang.vercel.app/`)
 
-   **Important**: Use just the base domain for the callback URL, not the full path. The OAuth flow handles the redirect back to the correct page.
+   **Important**: Use the full path to your playground for the callback URL. This ensures the OAuth redirect works correctly for subdirectory deployments.
 
 3. Click **Register application**
 
@@ -90,9 +90,9 @@ Currently, GitHub Models API is in preview and requires special access. You may 
 ### OAuth Errors
 
 #### "The redirect_uri is not associated with this application"
-- **Cause**: The Authorization callback URL in your GitHub OAuth app doesn't match the redirect URI
-- **Solution**: Ensure your OAuth app's callback URL is set to just the base domain (e.g., `https://yourusername.github.io`)
-- **Note**: The playground automatically handles redirects to the correct page within your domain
+- **Cause**: The Authorization callback URL in your GitHub OAuth app doesn't match the redirect URI being sent
+- **Solution**: Ensure your OAuth app's callback URL is set to your full playground URL (e.g., `https://yourusername.github.io/slanglang/`)
+- **Note**: The callback URL must include the full path to your playground deployment
 
 #### "Invalid client"
 - **Cause**: Wrong Client ID in `config.js`
