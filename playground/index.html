@@ -1678,6 +1678,9 @@ make tracks.`
 
                     console.log('Checking stored auth:', { token: token ? 'exists' : 'null', tokenExpiry, now: Date.now() });
 
+                    // Check for persisted OAuth debug info
+                    this.displayOAuthDebugInfo();
+
                     if (token && tokenExpiry) {
                         const now = Date.now();
                         if (now < parseInt(tokenExpiry)) {
@@ -1696,21 +1699,70 @@ make tracks.`
                     }
                 }
 
+                displayOAuthDebugInfo() {
+                    // Display any persisted OAuth debug info from previous page loads
+                    const debugKeys = [
+                        'oauth-debug-callback-called',
+                        'oauth-debug-url',
+                        'oauth-debug-timestamp',
+                        'oauth-debug-params',
+                        'oauth-debug-processing',
+                        'oauth-debug-state-check',
+                        'oauth-debug-error',
+                        'oauth-debug-url-cleaned',
+                        'oauth-debug-no-params'
+                    ];
+
+                    let hasDebugInfo = false;
+                    console.log('=== OAuth Debug Info (from previous page load) ===');
+
+                    for (const key of debugKeys) {
+                        const value = sessionStorage.getItem(key);
+                        if (value) {
+                            hasDebugInfo = true;
+                            console.log(`${key}:`, value);
+                            sessionStorage.removeItem(key); // Clear after displaying
+                        }
+                    }
+
+                    if (!hasDebugInfo) {
+                        console.log('No OAuth debug info from previous page load');
+                    }
+                    console.log('================================================');
+                }
+
                 handleOAuthCallback() {
+                    // Store debug info in sessionStorage to persist across page reloads
+                    sessionStorage.setItem('oauth-debug-callback-called', 'true');
+                    sessionStorage.setItem('oauth-debug-url', window.location.href);
+                    sessionStorage.setItem('oauth-debug-timestamp', Date.now().toString());
+
+                    console.log('handleOAuthCallback called');
                     const urlParams = new URLSearchParams(window.location.search);
                     const code = urlParams.get('code');
                     const state = urlParams.get('state');
 
+                    console.log('OAuth callback params:', { code: code ? 'present' : 'null', state: state ? 'present' : 'null' });
+                    sessionStorage.setItem('oauth-debug-params', JSON.stringify({ code: code ? 'present' : 'null', state: state ? 'present' : 'null' }));
+
                     if (code && state) {
+                        console.log('Processing OAuth callback');
+                        sessionStorage.setItem('oauth-debug-processing', 'true');
+
                         // Verify state to prevent CSRF
                         const storedState = sessionStorage.getItem('oauth-state');
+                        console.log('State verification:', { provided: state, stored: storedState });
+                        sessionStorage.setItem('oauth-debug-state-check', JSON.stringify({ provided: state, stored: storedState }));
+
                         if (state !== storedState) {
                             console.error('OAuth state mismatch');
+                            sessionStorage.setItem('oauth-debug-error', 'state-mismatch');
                             return;
                         }
 
                         // Clear the state
                         sessionStorage.removeItem('oauth-state');
+                        console.log('State cleared');
 
                         // Exchange code for token
                         this.exchangeCodeForToken(code);
@@ -1720,6 +1772,11 @@ make tracks.`
                         url.searchParams.delete('code');
                         url.searchParams.delete('state');
                         window.history.replaceState({}, '', url);
+                        console.log('URL cleaned up');
+                        sessionStorage.setItem('oauth-debug-url-cleaned', 'true');
+                    } else {
+                        console.log('No OAuth callback parameters found');
+                        sessionStorage.setItem('oauth-debug-no-params', 'true');
                     }
                 }
 
@@ -1778,9 +1835,16 @@ make tracks.`
                 }
 
                 async exchangeCodeForToken(code) {
-                    if (!this.clientId) return;
+                    console.log('exchangeCodeForToken called with code:', code ? 'present' : 'null');
+
+                    if (!this.clientId) {
+                        console.error('No client ID available');
+                        return;
+                    }
 
                     const codeVerifier = sessionStorage.getItem('pkce-code-verifier');
+                    console.log('Code verifier:', codeVerifier ? 'present' : 'null');
+
                     if (!codeVerifier) {
                         console.error('No code verifier found');
                         return;
@@ -1788,8 +1852,18 @@ make tracks.`
 
                     // Clear the verifier
                     sessionStorage.removeItem('pkce-code-verifier');
+                    console.log('Code verifier cleared');
+
+                    const redirectUri = window.location.origin + window.location.pathname;
+                    console.log('Token exchange request:', {
+                        client_id: this.clientId,
+                        code: code,
+                        code_verifier: codeVerifier ? 'present' : 'null',
+                        redirect_uri: redirectUri
+                    });
 
                     try {
+                        console.log('Making token exchange request...');
                         const response = await fetch('https://github.com/login/oauth/access_token', {
                             method: 'POST',
                             headers: {
@@ -1800,13 +1874,17 @@ make tracks.`
                                 client_id: this.clientId,
                                 code: code,
                                 code_verifier: codeVerifier,
-                                redirect_uri: window.location.origin + window.location.pathname
+                                redirect_uri: redirectUri
                             })
                         });
 
+                        console.log('Token exchange response status:', response.status);
+
                         const data = await response.json();
+                        console.log('Token exchange response data:', data);
 
                         if (data.access_token) {
+                            console.log('Access token received successfully');
                             console.log('OAuth successful, token received');
                             this.githubToken = data.access_token;
                             this.isAuthenticated = true;
@@ -1831,7 +1909,7 @@ make tracks.`
                             alert('Authentication failed. Please try again.');
                         }
                     } catch (error) {
-                        console.error('Error exchanging code for token:', error);
+                        console.error('Network error exchanging code for token:', error);
                         alert('Authentication failed. Please try again.');
                     }
                 }
