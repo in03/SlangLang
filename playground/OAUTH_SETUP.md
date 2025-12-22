@@ -1,6 +1,6 @@
 # GitHub OAuth Setup for SlangLang Playground
 
-This guide will help you set up GitHub OAuth for the AI code generator feature.
+This guide will help you set up GitHub OAuth for the AI code generator feature using **Device Flow** - a client-side only solution!
 
 ## Prerequisites
 
@@ -14,9 +14,9 @@ This guide will help you set up GitHub OAuth for the AI code generator feature.
    - **Application name**: `SlangLang Playground` (or whatever you prefer)
    - **Homepage URL**: Your deployment URL (e.g., `https://yourusername.github.io/slanglang` or `https://slanglang.vercel.app`)
    - **Application description**: `AI-powered code generator for SlangLang`
-   - **Authorization callback URL**: Your playground URL (e.g., `https://yourusername.github.io/slanglang/` or `https://slanglang.vercel.app/`)
+   - **Authorization callback URL**: Leave blank or use any placeholder URL (not used in Device Flow)
 
-   **Important**: Use the full path to your playground for the callback URL. This ensures the OAuth redirect works correctly for subdirectory deployments.
+   **Important**: Device Flow doesn't require redirect URIs! You can leave this field blank.
 
 3. Click **Register application**
 
@@ -71,14 +71,18 @@ Currently, GitHub Models API is in preview and requires special access. You may 
 1. Build the playground: `bun run build:playground`
 2. Deploy the `playground/dist/` folder to GitHub Pages or Vercel
 
+**No backend server required!** Device Flow works entirely client-side.
+
 ## Testing the OAuth Flow
 
 1. Open the deployed playground
 2. Try to use the AI code generator
 3. You should see the authentication modal
 4. Click "Sign in with GitHub"
-5. Complete the OAuth flow
-6. Try generating some code!
+5. A device code modal will appear with instructions
+6. Go to `https://github.com/login/device` and enter the code
+7. Authentication completes automatically
+8. Try generating some code!
 
 ## Troubleshooting
 
@@ -89,10 +93,13 @@ Currently, GitHub Models API is in preview and requires special access. You may 
 
 ### OAuth Errors
 
-#### "The redirect_uri is not associated with this application"
-- **Cause**: The Authorization callback URL in your GitHub OAuth app doesn't match the redirect URI being sent
-- **Solution**: Ensure your OAuth app's callback URL is set to your full playground URL (e.g., `https://yourusername.github.io/slanglang/`)
-- **Note**: The callback URL must include the full path to your playground deployment
+#### Device Flow Issues
+
+**Device Flow doesn't use redirect URIs**, so callback URL configuration is not required. If you encounter issues:
+
+- **"Invalid client"**: Double-check your Client ID in `config.js`
+- **"Device code expired"**: The user code expired before authentication
+- **Network errors**: Check your internet connection
 
 #### "Invalid client"
 - **Cause**: Wrong Client ID in `config.js`
@@ -134,14 +141,17 @@ Currently, GitHub Models API is in preview and requires special access. You may 
 
 ⚠️ **Public Client ID**: The OAuth client ID is exposed in frontend code (but this is expected for public clients)
 
-### Client Secret Myth
+### Device Flow Security
 
-**Public clients like SPAs do NOT use client secrets.** This is actually a security advantage:
+**Device Flow is designed for client-side applications** and provides excellent security:
 
-- **Server-side apps**: Need to store client secrets securely (can leak via breaches)
-- **Public clients**: Use PKCE instead - no secrets to leak!
+- **No client secrets** stored in the client
+- **Short-lived device codes** (expire quickly)
+- **User-mediated authentication** (user must explicitly enter code)
+- **No redirect URI vulnerabilities**
+- **Polling-based token retrieval** (secure and rate-limited)
 
-The PKCE flow we implement is the modern, secure way for browsers and mobile apps to do OAuth.
+Device Flow is the recommended approach for SPAs that need OAuth without backend infrastructure.
 
 ### Risk Assessment for This Use Case
 
@@ -178,4 +188,12 @@ For production applications with higher security requirements:
 
 ### Current Implementation Security
 
-This playground implementation follows OAuth 2.1 best practices for public clients and is **secure enough** for a developer playground tool. The primary risk is XSS attacks stealing short-lived, low-privilege tokens.
+This playground uses **GitHub Device Flow** which is specifically designed for client-side applications and provides excellent security:
+
+- **No backend required** - completely client-side
+- **No client secrets** - no sensitive data in the client
+- **User-mediated authentication** - explicit user consent required
+- **Short-lived tokens** - GitHub tokens expire after 8 hours
+- **Rate-limited polling** - prevents abuse
+
+Device Flow is the most secure OAuth approach for SPAs without server infrastructure.

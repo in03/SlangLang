@@ -1,25 +1,14 @@
 {
   "name": "slanglang",
-  "version": "0.2.0",
-  "description": "Australian slang programming language",
-  "bin": {
-    "aussie": "./bin/aussie.js"
-  },
+  "version": "1.0.0",
+  "description": "SlangLang - A programming language that's had a few too many",
   "scripts": {
-    "build:grammar": "bun node_modules/nearley/bin/nearleyc.js grammar.ne -o grammar.js",
-    "build:syntax": "bun tools/generate-syntax.js",
-    "build:vsix": "bun tools/package-extension.js --install",
-    "build:playground": "bun playground/build.js",
-    "build": "bun run build:grammar && bun run build:syntax",
-    "build:all": "bun run build && bun run build:vsix && bun run build:playground",
-    "test": "bun bin/aussie.js examples/features.slang"
-  },
-  "dependencies": {
-    "moo": "^0.5.2",
-    "nearley": "^2.20.1"
+    "build:playground": "node playground/build.js"
   },
   "devDependencies": {
-    "@vscode/vsce": "^2.22.0",
-    "esbuild": "^0.27.2"
-  }
+    "bun": "^1.0.0"
+  },
+  "keywords": ["programming-language", "javascript", "transpiler", "australian"],
+  "author": "",
+  "license": "MIT"
 }
