@@ -15,20 +15,36 @@ aussie examples/demo.slang
 
 Try SlangLang in your browser with an interactive playground featuring AI-powered code generation:
 
+### Development
+
 ```bash
 bun run build:playground
 # Then open playground/dist/index.html
 ```
 
+### Production Deployment
+
+The playground is designed for **Vercel deployment** with serverless functions for secure OAuth:
+
+```bash
+# 1. Push to GitHub
+git add .
+git commit -m "Deploy to Vercel"
+git push origin main
+
+# 2. Import to Vercel (vercel.com)
+# 3. Set environment variables: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
+# 4. Deploy automatically
+```
+
 The playground includes:
 - **AI Code Generator**: Generate custom SlangLang code using GitHub Models API
 - **Interactive Editor**: Write and run SlangLang code with syntax highlighting
-- **GitHub OAuth**: Sign in to access AI features powered by GitHub Models
+- **Secure OAuth**: Server-side authentication with HTTP-only cookies
+- **API Proxy**: Server-side proxy to GitHub Models (no client-side tokens)
 - **Compilation View**: See your SlangLang code transpiled to JavaScript
 
-**Setup GitHub OAuth** for AI features: See `playground/OAUTH_SETUP.md`
-
-> **Security Note**: The playground uses client-side OAuth which is secure for this use case but stores tokens in localStorage. For high-security applications, consider server-side OAuth implementation.
+**Deployment Guide**: See `VERCEL_DEPLOYMENT.md`
 
 ## Syntax
 
