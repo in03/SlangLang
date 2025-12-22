@@ -1560,7 +1560,7 @@ make tracks.`
                     this.githubToken = null;
                     this.specContent = null;
                     this.isAuthenticated = false;
-                    this.clientId = null; // Will be set from environment or config
+                    this.clientId = window.SlangLangConfig?.GITHUB_CLIENT_ID; // Set client ID from config
                     this.pendingPrompt = null; // Store prompt when showing auth modal
 
                     this.init();
@@ -1782,9 +1782,6 @@ make tracks.`
 
                 async authenticateWithGitHub() {
                     console.log('Starting GitHub authentication');
-
-                    // Get client ID from config
-                    this.clientId = window.SlangLangConfig?.GITHUB_CLIENT_ID;
                     console.log('Client ID:', this.clientId);
 
                     if (!this.clientId || this.clientId === 'your-github-oauth-app-client-id') {
@@ -1836,6 +1833,7 @@ make tracks.`
 
                 async exchangeCodeForToken(code) {
                     console.log('exchangeCodeForToken called with code:', code ? 'present' : 'null');
+                    console.log('Client ID available:', this.clientId ? 'yes' : 'no');
 
                     if (!this.clientId) {
                         console.error('No client ID available');
