@@ -1614,12 +1614,17 @@ make tracks.`
                                          window.location.hostname === 'localhost' ||
                                          window.location.hostname === '127.0.0.1';
 
+                        console.log('Generate button clicked:', { isDevMode, isLocalDev, isAuthenticated: this.isAuthenticated });
+
                         if (isDevMode || isLocalDev) {
                             // Development mode - allow generation without auth
+                            console.log('Using dev mode');
                             this.generateCode();
                         } else if (!this.isAuthenticated) {
+                            console.log('Not authenticated, showing modal');
                             this.showAuthModal();
                         } else {
+                            console.log('Authenticated, generating code');
                             this.generateCode();
                         }
                     });
@@ -1671,17 +1676,23 @@ make tracks.`
                     const token = localStorage.getItem('slanglang-github-token');
                     const tokenExpiry = localStorage.getItem('slanglang-github-token-expiry');
 
+                    console.log('Checking stored auth:', { token: token ? 'exists' : 'null', tokenExpiry, now: Date.now() });
+
                     if (token && tokenExpiry) {
                         const now = Date.now();
                         if (now < parseInt(tokenExpiry)) {
+                            console.log('Token is valid, setting authenticated');
                             this.githubToken = token;
                             this.isAuthenticated = true;
                             this.updateAuthUI();
                         } else {
+                            console.log('Token expired, clearing');
                             // Token expired, clear it
                             localStorage.removeItem('slanglang-github-token');
                             localStorage.removeItem('slanglang-github-token-expiry');
                         }
+                    } else {
+                        console.log('No stored token found');
                     }
                 }
 
@@ -1713,10 +1724,14 @@ make tracks.`
                 }
 
                 async authenticateWithGitHub() {
+                    console.log('Starting GitHub authentication');
+
                     // Get client ID from config
                     this.clientId = window.SlangLangConfig?.GITHUB_CLIENT_ID;
+                    console.log('Client ID:', this.clientId);
 
                     if (!this.clientId || this.clientId === 'your-github-oauth-app-client-id') {
+                        console.log('Client ID not configured');
                         alert('GitHub OAuth not configured. Please update config.js with your GitHub OAuth App Client ID.\n\nCreate an OAuth app at: https://github.com/settings/applications/new');
                         return;
                     }
@@ -1726,7 +1741,10 @@ make tracks.`
                                      window.location.hostname === 'localhost' ||
                                      window.location.hostname === '127.0.0.1';
 
+                    console.log('Environment check:', { protocol: window.location.protocol, hostname: window.location.hostname, isLocalDev });
+
                     if (isLocalDev) {
+                        console.log('Local development detected, showing alert');
                         alert('Local development detected. For OAuth testing, please:\n\n1. Serve files via HTTP server (not file://)\n2. Use HTTPS for production OAuth\n3. Or deploy to test OAuth flow\n\nFor local testing, consider using ngrok or similar tunneling service.');
                         return;
                     }
@@ -1789,6 +1807,7 @@ make tracks.`
                         const data = await response.json();
 
                         if (data.access_token) {
+                            console.log('OAuth successful, token received');
                             this.githubToken = data.access_token;
                             this.isAuthenticated = true;
 
@@ -1796,6 +1815,7 @@ make tracks.`
                             const expiry = Date.now() + (8 * 60 * 60 * 1000); // 8 hours
                             localStorage.setItem('slanglang-github-token', data.access_token);
                             localStorage.setItem('slanglang-github-token-expiry', expiry.toString());
+                            console.log('Token stored in localStorage');
 
                             this.updateAuthUI();
 
