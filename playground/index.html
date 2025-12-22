@@ -1560,7 +1560,10 @@ make tracks.`
                     this.githubToken = null;
                     this.specContent = null;
                     this.isAuthenticated = false;
+                    console.log('Config available:', window.SlangLangConfig ? 'yes' : 'no');
+                    console.log('Config client ID:', window.SlangLangConfig?.GITHUB_CLIENT_ID);
                     this.clientId = window.SlangLangConfig?.GITHUB_CLIENT_ID; // Set client ID from config
+                    console.log('Set clientId to:', this.clientId);
                     this.pendingPrompt = null; // Store prompt when showing auth modal
 
                     this.init();
@@ -1614,17 +1617,11 @@ make tracks.`
                                          window.location.hostname === 'localhost' ||
                                          window.location.hostname === '127.0.0.1';
 
-                        console.log('Generate button clicked:', { isDevMode, isLocalDev, isAuthenticated: this.isAuthenticated });
-
                         if (isDevMode || isLocalDev) {
-                            // Development mode - allow generation without auth
-                            console.log('Using dev mode');
                             this.generateCode();
                         } else if (!this.isAuthenticated) {
-                            console.log('Not authenticated, showing modal');
                             this.showAuthModal();
                         } else {
-                            console.log('Authenticated, generating code');
                             this.generateCode();
                         }
                     });
@@ -1676,26 +1673,20 @@ make tracks.`
                     const token = localStorage.getItem('slanglang-github-token');
                     const tokenExpiry = localStorage.getItem('slanglang-github-token-expiry');
 
-                    console.log('Checking stored auth:', { token: token ? 'exists' : 'null', tokenExpiry, now: Date.now() });
-
                     // Check for persisted OAuth debug info
                     this.displayOAuthDebugInfo();
 
                     if (token && tokenExpiry) {
                         const now = Date.now();
                         if (now < parseInt(tokenExpiry)) {
-                            console.log('Token is valid, setting authenticated');
                             this.githubToken = token;
                             this.isAuthenticated = true;
                             this.updateAuthUI();
                         } else {
-                            console.log('Token expired, clearing');
                             // Token expired, clear it
                             localStorage.removeItem('slanglang-github-token');
                             localStorage.removeItem('slanglang-github-token-expiry');
                         }
-                    } else {
-                        console.log('No stored token found');
                     }
                 }
 
@@ -1782,7 +1773,6 @@ make tracks.`
 
                 async authenticateWithGitHub() {
                     console.log('Starting GitHub authentication');
-                    console.log('Client ID:', this.clientId);
 
                     if (!this.clientId || this.clientId === 'your-github-oauth-app-client-id') {
                         console.log('Client ID not configured');
