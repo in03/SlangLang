@@ -1729,16 +1729,83 @@ make tracks.`
                     sessionStorage.setItem('oauth-debug-timestamp', Date.now().toString());
 
                     console.log('handleOAuthCallback called');
+
+                    // Check for implicit flow response (access token in URL fragment)
+                    if (window.location.hash) {
+                        console.log('Checking for implicit flow response');
+                        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                        const accessToken = hashParams.get('access_token');
+                        const state = hashParams.get('state');
+                        const tokenType = hashParams.get('token_type');
+
+                        console.log('Implicit flow params:', {
+                            accessToken: accessToken ? 'present' : 'null',
+                            state: state ? 'present' : 'null',
+                            tokenType
+                        });
+                        sessionStorage.setItem('oauth-debug-implicit-params', JSON.stringify({
+                            accessToken: accessToken ? 'present' : 'null',
+                            state: state ? 'present' : 'null',
+                            tokenType
+                        }));
+
+                        if (accessToken && state) {
+                            console.log('Processing implicit flow response');
+                            sessionStorage.setItem('oauth-debug-processing', 'implicit');
+
+                            // Verify state to prevent CSRF
+                            const storedState = sessionStorage.getItem('oauth-state');
+                            console.log('State verification:', { provided: state, stored: storedState });
+
+                            if (state !== storedState) {
+                                console.error('OAuth state mismatch');
+                                sessionStorage.setItem('oauth-debug-error', 'state-mismatch');
+                                return;
+                            }
+
+                            // Clear the state
+                            sessionStorage.removeItem('oauth-state');
+                            console.log('State cleared');
+
+                            // Store the access token directly (no exchange needed in implicit flow)
+                            this.githubToken = accessToken;
+                            this.isAuthenticated = true;
+
+                            // Store token with expiry (GitHub tokens are typically valid for 8 hours)
+                            const expiry = Date.now() + (8 * 60 * 60 * 1000); // 8 hours
+                            localStorage.setItem('slanglang-github-token', accessToken);
+                            localStorage.setItem('slanglang-github-token-expiry', expiry.toString());
+
+                            console.log('Access token stored successfully');
+                            this.updateAuthUI();
+
+                            // Auto-generate if there's a pending prompt from before auth
+                            if (this.pendingPrompt) {
+                                const pendingPrompt = this.pendingPrompt;
+                                this.pendingPrompt = null; // Clear it
+                                // Small delay to let UI update first
+                                setTimeout(() => this.generateCode(pendingPrompt), 500);
+                            }
+
+                            // Clean up URL fragment
+                            window.history.replaceState({}, '', window.location.pathname);
+                            console.log('URL fragment cleaned up');
+                            sessionStorage.setItem('oauth-debug-url-cleaned', 'implicit');
+                            return;
+                        }
+                    }
+
+                    // Fallback: Check for authorization code flow (legacy)
                     const urlParams = new URLSearchParams(window.location.search);
                     const code = urlParams.get('code');
                     const state = urlParams.get('state');
 
-                    console.log('OAuth callback params:', { code: code ? 'present' : 'null', state: state ? 'present' : 'null' });
+                    console.log('OAuth callback params (code flow):', { code: code ? 'present' : 'null', state: state ? 'present' : 'null' });
                     sessionStorage.setItem('oauth-debug-params', JSON.stringify({ code: code ? 'present' : 'null', state: state ? 'present' : 'null' }));
 
                     if (code && state) {
-                        console.log('Processing OAuth callback');
-                        sessionStorage.setItem('oauth-debug-processing', 'true');
+                        console.log('Processing authorization code flow');
+                        sessionStorage.setItem('oauth-debug-processing', 'code');
 
                         // Verify state to prevent CSRF
                         const storedState = sessionStorage.getItem('oauth-state');
@@ -1764,7 +1831,7 @@ make tracks.`
                         url.searchParams.delete('state');
                         window.history.replaceState({}, '', url);
                         console.log('URL cleaned up');
-                        sessionStorage.setItem('oauth-debug-url-cleaned', 'true');
+                        sessionStorage.setItem('oauth-debug-url-cleaned', 'code');
                     } else {
                         console.log('No OAuth callback parameters found');
                         sessionStorage.setItem('oauth-debug-no-params', 'true');
@@ -1793,29 +1860,24 @@ make tracks.`
                         return;
                     }
 
-                    // Use current path for redirect URI (GitHub OAuth app should be configured to allow this URL)
+                    // For client-side OAuth, we need to use the implicit flow or a proxy
+                    // GitHub doesn't allow CORS requests to the token endpoint from browsers
+                    // Let's try the implicit flow approach instead
+
                     const redirectUri = window.location.origin + window.location.pathname;
                     const scope = 'read:user';
-
-                    // Generate PKCE code verifier and challenge
-                    const codeVerifier = this.generateCodeVerifier();
-                    const codeChallenge = await this.generateCodeChallenge(codeVerifier);
-
-                    // Store code verifier for later
-                    sessionStorage.setItem('pkce-code-verifier', codeVerifier);
 
                     // Generate state for CSRF protection
                     const state = this.generateState();
                     sessionStorage.setItem('oauth-state', state);
 
-                    // Build OAuth URL
+                    // Build OAuth URL for implicit flow
                     const authUrl = new URL('https://github.com/login/oauth/authorize');
                     authUrl.searchParams.set('client_id', this.clientId);
                     authUrl.searchParams.set('redirect_uri', redirectUri);
                     authUrl.searchParams.set('scope', scope);
                     authUrl.searchParams.set('state', state);
-                    authUrl.searchParams.set('code_challenge', codeChallenge);
-                    authUrl.searchParams.set('code_challenge_method', 'S256');
+                    authUrl.searchParams.set('response_type', 'token'); // Implicit flow
 
                     // Redirect to GitHub
                     window.location.href = authUrl.toString();
