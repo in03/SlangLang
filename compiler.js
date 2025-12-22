@@ -15,6 +15,10 @@ function genExpr(expr) {
       return expr.name;
     case "Empty":
       return "[]";
+    case "EmptyList":
+      return "[]";
+    case "EmptyDict":
+      return "{}";
     case "BinOp":
       return `(${genExpr(expr.left)} ${expr.op} ${genExpr(expr.right)})`;
     case "Concat":
@@ -86,9 +90,7 @@ function compile(ast, level = 0) {
       }
       
       case "List": {
-        const listBody = node.items.map(i => 
-          typeof i === "string" ? JSON.stringify(i) : i
-        ).join(", ");
+        const listBody = node.items.map(i => genExpr(i)).join(", ");
         return `let ${node.name} = [${listBody}];`;
       }
       
@@ -104,10 +106,28 @@ function compile(ast, level = 0) {
       }
       
       case "Append": {
-        const item = typeof node.item === "string" 
-          ? JSON.stringify(node.item) 
-          : (typeof node.item === "object" ? genExpr(node.item) : node.item);
-        return `${node.target}.push(${item});`;
+        // Handle both single items and arrays of items from tossin syntax
+        if (Array.isArray(node.item)) {
+          const items = node.item.map(item => genExpr(item)).join(", ");
+          return `${node.target}.push(${items});`;
+        } else {
+          const item = typeof node.item === "string"
+            ? JSON.stringify(node.item)
+            : (typeof node.item === "object" ? genExpr(node.item) : node.item);
+          return `${node.target}.push(${item});`;
+        }
+      }
+
+      case "DictAppend": {
+        // Handle dictionary appends from tossin syntax
+        const entries = node.entries.map(entry => {
+          // Each entry is an object with key/value properties
+          if (entry.key && entry.value) {
+            return `${JSON.stringify(entry.key)}: ${genExpr(entry.value)}`;
+          }
+          return "";
+        }).filter(e => e).join(", ");
+        return `Object.assign(${node.target}, {${entries}});`;
       }
       
       case "Remove":

@@ -237,14 +237,19 @@ arglist -> expr {% d => [d[0]] %}
 
 # ============ ESKY (LIST) ============
 # goodies is esky: bloody beer, bloody chips.
-eskydef -> %IDENT %KW_IS %KW_ESKY %COLON eskyitems %DOT {% 
-  d => ({ type: "List", name: d[0].value, items: d[4] }) 
+# goodies is esky. (empty)
+eskydef -> %IDENT %KW_IS %KW_ESKY %COLON eskyitems %DOT {%
+  d => ({ type: "List", name: d[0].value, items: d[4] })
+%}
+         | %IDENT %KW_IS %KW_ESKY %DOT {%
+  d => ({ type: "List", name: d[0].value, items: [] })
 %}
 
 eskyitems -> eskyitem {% d => [d[0]] %}
           | eskyitems %COMMA eskyitem {% d => [...d[0], d[2]] %}
 
-eskyitem -> %BLOODY_ITEM {% d => d[0].value %}
+eskyitem -> expr {% d => d[0] %}
+         | %BLOODY_ITEM {% d => d[0].value %}
          | %NUMBER {% d => parseFloat(d[0].value) %}
          | %STRING {% d => JSON.parse(d[0].value) %}
 
@@ -255,8 +260,12 @@ eskyexpr -> %KW_ESKY %COLON eskyitems {%
 
 # ============ TUCKSHOP (DICTIONARY) ============
 # menu is tuckshop: pies is 5, sauce is "tomato".
-tuckshopdef -> %IDENT %KW_IS %KW_TUCKSHOP %COLON tuckshopitems %DOT {% 
-  d => ({ type: "Dict", name: d[0].value, entries: d[4] }) 
+# menu is tuckshop. (empty)
+tuckshopdef -> %IDENT %KW_IS %KW_TUCKSHOP %COLON tuckshopitems %DOT {%
+  d => ({ type: "Dict", name: d[0].value, entries: d[4] })
+%}
+             | %IDENT %KW_IS %KW_TUCKSHOP %DOT {%
+  d => ({ type: "Dict", name: d[0].value, entries: [] })
 %}
 
 tuckshopitems -> tuckshopitem {% d => [d[0]] %}

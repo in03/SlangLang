@@ -169,19 +169,26 @@ var grammar = {
     {"name": "arglist", "symbols": ["expr"], "postprocess": d => [d[0]]},
     {"name": "arglist", "symbols": ["arglist", (lexer.has("KW_AND") ? {type: "KW_AND"} : KW_AND), "expr"], "postprocess": d => [...d[0], d[2]]},
     {"name": "arglist", "symbols": ["arglist", (lexer.has("COMMA") ? {type: "COMMA"} : COMMA), "expr"], "postprocess": d => [...d[0], d[2]]},
-    {"name": "eskydef", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_ESKY") ? {type: "KW_ESKY"} : KW_ESKY), (lexer.has("COLON") ? {type: "COLON"} : COLON), "eskyitems", (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess":  
-        d => ({ type: "List", name: d[0].value, items: d[4] }) 
+    {"name": "eskydef", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_ESKY") ? {type: "KW_ESKY"} : KW_ESKY), (lexer.has("COLON") ? {type: "COLON"} : COLON), "eskyitems", (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": 
+        d => ({ type: "List", name: d[0].value, items: d[4] })
+        },
+    {"name": "eskydef", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_ESKY") ? {type: "KW_ESKY"} : KW_ESKY), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": 
+        d => ({ type: "List", name: d[0].value, items: [] })
         },
     {"name": "eskyitems", "symbols": ["eskyitem"], "postprocess": d => [d[0]]},
     {"name": "eskyitems", "symbols": ["eskyitems", (lexer.has("COMMA") ? {type: "COMMA"} : COMMA), "eskyitem"], "postprocess": d => [...d[0], d[2]]},
+    {"name": "eskyitem", "symbols": ["expr"], "postprocess": d => d[0]},
     {"name": "eskyitem", "symbols": [(lexer.has("BLOODY_ITEM") ? {type: "BLOODY_ITEM"} : BLOODY_ITEM)], "postprocess": d => d[0].value},
     {"name": "eskyitem", "symbols": [(lexer.has("NUMBER") ? {type: "NUMBER"} : NUMBER)], "postprocess": d => parseFloat(d[0].value)},
     {"name": "eskyitem", "symbols": [(lexer.has("STRING") ? {type: "STRING"} : STRING)], "postprocess": d => JSON.parse(d[0].value)},
     {"name": "eskyexpr", "symbols": [(lexer.has("KW_ESKY") ? {type: "KW_ESKY"} : KW_ESKY), (lexer.has("COLON") ? {type: "COLON"} : COLON), "eskyitems"], "postprocess":  
         d => ({ type: "ListExpr", items: d[2] }) 
         },
-    {"name": "tuckshopdef", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_TUCKSHOP") ? {type: "KW_TUCKSHOP"} : KW_TUCKSHOP), (lexer.has("COLON") ? {type: "COLON"} : COLON), "tuckshopitems", (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess":  
-        d => ({ type: "Dict", name: d[0].value, entries: d[4] }) 
+    {"name": "tuckshopdef", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_TUCKSHOP") ? {type: "KW_TUCKSHOP"} : KW_TUCKSHOP), (lexer.has("COLON") ? {type: "COLON"} : COLON), "tuckshopitems", (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": 
+        d => ({ type: "Dict", name: d[0].value, entries: d[4] })
+        },
+    {"name": "tuckshopdef", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_TUCKSHOP") ? {type: "KW_TUCKSHOP"} : KW_TUCKSHOP), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": 
+        d => ({ type: "Dict", name: d[0].value, entries: [] })
         },
     {"name": "tuckshopitems", "symbols": ["tuckshopitem"], "postprocess": d => [d[0]]},
     {"name": "tuckshopitems", "symbols": ["tuckshopitems", (lexer.has("COMMA") ? {type: "COMMA"} : COMMA), "tuckshopitem"], "postprocess": d => [...d[0], d[2]]},

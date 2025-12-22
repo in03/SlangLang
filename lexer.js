@@ -8,10 +8,10 @@ const KEYWORDS = {
   control:  ["if", "or", "otherwise", "make", "tracks"],
   loop:     ["scoffin", "dealin", "pass", "the", "from", "every", "in", "til", "fully", "sick", "full", "got"],
   function: ["prep", "barbie", "with", "and", "fair", "go", "serve", "on", "off", "howbout"],
-    operator: ["is", "then", "tops", "cops", "equals", "not", "plus", "minus", "times", "dividedby"],
+    operator: ["is", "then", "tops", "cops", "equals", "not", "as", "plus", "minus", "times", "dividedby", "friggen"],
   type:     ["flamin", "frothin", "spewin", "esky", "tuckshop", "empty"],
   builtin:  ["crikey", "grab", "at", "chuck", "lot", "mates", "call", "bugger", "suss", "gimme",
-             "another", "shrimp", "ditch", "drop", "last", "first", "snag", "sheepshear", "top", "up", "oi"],
+             "another", "shrimp", "ditch", "drop", "last", "first", "snag", "sheepshear", "top", "up", "tossin", "noice", "oi"],
   literal:  ["yeah", "nah", "nothin"],
   string:   ["bloody", "mate"],
   special:  ["isn't", "who's"],  // Keywords with apostrophes (need regex, not kw())
@@ -106,7 +106,10 @@ function createLexer() {
       KW_SHEEPSHEAR: kw("sheepshear"),
       KW_TOPS: kw("tops"),
       KW_COPS: kw("cops"),
+      KW_TOP: kw("top"),
       KW_UP: kw("up"),
+      KW_TOSSIN: kw("tossin"),
+      KW_NOICE: kw("noice"),
       KW_GRAB: kw("grab"),
       KW_AT: kw("at"),
       
@@ -120,6 +123,7 @@ function createLexer() {
       // Comparison operators (tops = >, cops = <)
       KW_EQUALS: kw("equals"),
       KW_NOT: kw("not"),
+      KW_AS: kw("as"),
       KW_AND: kw("and"),
       
       // Arithmetic operators
@@ -127,6 +131,7 @@ function createLexer() {
       KW_MINUS: kw("minus"),
       KW_TIMES: kw("times"),
       KW_DIVIDEDBY: kw("dividedby"),
+      KW_FRIGGEN: kw("friggen"),
       
       // Import keywords
       KW_CHUCK: kw("chuck"),

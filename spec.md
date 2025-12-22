@@ -210,16 +210,19 @@ oi oi oi
 
 | Token       | Meaning                    |
 | ----------- | -------------------------- |
-| `another`   | Append operation start     |
-| `shrimp`    | Append operation keyword   |
+| `tossin`    | Append operation start     |
+| `noice`     | Append block end           |
+| `as`        | Dict entry assignment      |
+| `another`   | Append operation start (legacy) |
+| `shrimp`    | Append operation keyword (legacy) |
 | `ditch`     | Remove operation           |
 | `drop`      | Pop operation              |
 | `last`      | Last element specifier     |
 | `first`     | First element specifier    |
 | `snag`      | Element noun               |
 | `sheepshear`| Slice operation            |
-| `top`       | Append alternative start   |
-| `up`        | Append alternative part    |
+| `top`       | Append alternative start (legacy) |
+| `up`        | Append alternative part (legacy) |
 | `grab`      | Index/key access           |
 | `at`        | Access specifier           |
 
@@ -573,11 +576,35 @@ goodies is esky: bloody beer, bloody chips, bloody lamington.
 numbers is esky: 1, 2, 3.
 ```
 
+Empty lists can be created by omitting the colon and items:
+
+```slang
+empty_list is esky.
+```
+
+Lists can contain variables as well as hardcoded values:
+
+```slang
+food is bloody chips mate.
+condiment is flamin sauce.
+
+goodies is esky: food, condiment, bloody beer.
+```
+
 Compiles to:
 
 ```js
-let goodies = ["beer", "chips", "lamington"];
-let numbers = [1, 2, 3];
+let empty_list = [];
+let food = "chips";
+let condiment = 5;
+let goodies = [food, condiment, "beer"];
+```
+
+Empty lists can be created in multiple ways:
+
+```slang
+empty_list is empty esky.
+another_empty is esky.
 ```
 
 ### Tuckshop (Dictionary)
@@ -588,10 +615,35 @@ Declare a dictionary using `tuckshop:` followed by key-value pairs:
 menu is tuckshop: pies is 5, sauce is "tomato", roll is 3.
 ```
 
+Empty dictionaries can be created by omitting the colon and entries:
+
+```slang
+empty_dict is tuckshop.
+```
+
+Dictionaries can contain variables as well as hardcoded values:
+
+```slang
+price is flamin 8.
+name is bloody hot dog mate.
+
+menu is tuckshop: food is name, cost is price, available is yeah.
+```
+
 Compiles to:
 
 ```js
-let menu = { pies: 5, sauce: "tomato", roll: 3 };
+let empty_dict = {};
+let price = 8;
+let name = "hot dog";
+let menu = { food: name, cost: price, available: true };
+```
+
+Empty dictionaries can be created in multiple ways:
+
+```slang
+empty_dict is empty tuckshop.
+another_empty is tuckshop.
 ```
 
 ### Index/Key Access (Grab)
@@ -610,16 +662,30 @@ Crikey! grab pies from menu
 
 ### List Operations
 
-**Append (Another Shrimp):**
+**Append (Tossin - Inline):**
 
 ```slang
-another shrimp in goodies – bloody pavlova.
+tossin goodies: food, condiment.
 ```
 
-**Append (Top Up):**
+**Append (Tossin - Block):**
 
 ```slang
-goodies top up "snags"
+tossin goodies:
+  food,           # variable
+  bloody cheese,  # hardcoded string
+  flamin plates   # hardcoded number
+noice.
+```
+
+**Dictionary Append (Tossin):**
+
+```slang
+tossin menu:
+  food as bloody chips,
+  condiment as flamin sauce,
+  available as yeah
+noice.
 ```
 
 **Remove:**
@@ -907,6 +973,9 @@ Planned enhancements:
 * ✅ New function syntax (on the barbie)
 * ✅ Optional block terminators
 * ✅ Method chaining (then, then...with)
+* ✅ Empty collections (`x is esky.`, `x is tuckshop.`)
+* ✅ Variables in collection literals
+* ✅ New tossin append syntax (replaces another shrimp)
 
 ### Short Term
 
