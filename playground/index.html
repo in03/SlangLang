@@ -1352,6 +1352,7 @@ make tracks.`
                 constructor() {
                     this.githubToken = null;
                     this.specContent = null;
+                    this.examplesContent = null;
                     this.isAuthenticated = false;
                     this.pendingPrompt = null; // Store prompt when showing auth modal
 
@@ -1359,11 +1360,24 @@ make tracks.`
                 }
 
                 async init() {
+                    // Setup UI event listeners first
+                    this.setupEventListeners();
+
+                    // If on localhost server, enable UI immediately (before auth check)
+                    const isLocalServer = (window.location.hostname === 'localhost' || 
+                                         window.location.hostname === '127.0.0.1') &&
+                                         (window.location.protocol === 'http:' || window.location.protocol === 'https:');
+                    
+                    if (isLocalServer) {
+                        // Enable UI immediately for local dev server
+                        const promptInput = document.getElementById('aiPrompt');
+                        const generateBtn = document.getElementById('generateBtn');
+                        if (promptInput) promptInput.disabled = false;
+                        if (generateBtn) generateBtn.disabled = false;
+                    }
+
                     // Load spec.md content
                     await this.loadSpecContent();
-
-                    // Setup UI event listeners
-                    this.setupEventListeners();
 
                     // Check authentication status from server
                     await this.checkAuthStatus();
@@ -1385,6 +1399,22 @@ make tracks.`
                     } catch (error) {
                         console.warn('⚠️ Error loading spec.md:', error);
                         this.specContent = 'Specification file not available.';
+                    }
+                }
+
+                async loadExamplesContent() {
+                    try {
+                        const response = await fetch('./examples.md');
+                        if (response.ok) {
+                            this.examplesContent = await response.text();
+                            console.log('✅ Loaded examples.md (' + Math.round(this.examplesContent.length / 1024) + 'KB)');
+                        } else {
+                            console.warn('⚠️ Could not load examples.md: HTTP ' + response.status);
+                            this.examplesContent = null;
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Error loading examples.md:', error);
+                        this.examplesContent = null;
                     }
                 }
 
@@ -1413,9 +1443,11 @@ make tracks.`
                         if (response.ok) {
                             const data = await response.json();
                             this.isAuthenticated = data.authenticated || false;
+                            console.log('Auth status:', this.isAuthenticated ? 'authenticated' : 'not authenticated');
                         } else {
                             // If we get 401, 500, or any other error, user is not authenticated
                             this.isAuthenticated = false;
+                            console.log('Auth check failed with status:', response.status);
                             // Try to parse error response for debugging
                             try {
                                 const errorData = await response.json();
@@ -1454,19 +1486,28 @@ make tracks.`
                     const promptInput = document.getElementById('aiPrompt');
                     const generateBtn = document.getElementById('generateBtn');
 
-                    const isDevMode = window.SlangLangConfig?.DEV_MODE;
-                    const isLocalDev = window.location.protocol === 'file:' ||
-                                     window.location.hostname === 'localhost' ||
-                                     window.location.hostname === '127.0.0.1';
+                    if (!authBtn || !promptInput || !generateBtn) {
+                        console.error('UI elements not found');
+                        return;
+                    }
 
-                    if (isDevMode || isLocalDev) {
-                        // Development mode - always allow AI generation
+                    const isDevMode = window.SlangLangConfig?.DEV_MODE;
+                    const isFileProtocol = window.location.protocol === 'file:';
+                    // localhost server means we have API - check auth normally
+                    const isLocalServer = (window.location.hostname === 'localhost' || 
+                                         window.location.hostname === '127.0.0.1') &&
+                                         (window.location.protocol === 'http:' || window.location.protocol === 'https:');
+
+                    console.log('updateAuthUI:', { isDevMode, isFileProtocol, isLocalServer, isAuthenticated: this.isAuthenticated });
+
+                    if (isDevMode || isFileProtocol) {
+                        // Development mode (file:// or explicit dev mode) - always allow AI generation
                         authBtn.style.display = 'none';
                         promptInput.disabled = false;
                         generateBtn.disabled = false;
                         generateBtn.textContent = 'Generate (Dev)';
-                    } else if (this.isAuthenticated) {
-                        // Authenticated - hide auth button
+                    } else if (this.isAuthenticated || isLocalServer) {
+                        // Authenticated OR localhost server (which uses .env token)
                         authBtn.style.display = 'none';
                         promptInput.disabled = false;
                         generateBtn.disabled = false;
@@ -1534,13 +1575,16 @@ make tracks.`
                 }
 
                 async callGitHubAI(prompt) {
-                    // Check for development mode
+                    // Check for development mode (file:// protocol only, not localhost server)
                     const isDevMode = window.SlangLangConfig?.DEV_MODE;
-                    const isLocalDev = window.location.protocol === 'file:' ||
-                                     window.location.hostname === 'localhost' ||
-                                     window.location.hostname === '127.0.0.1';
+                    const isFileProtocol = window.location.protocol === 'file:';
+                    // localhost/127.0.0.1 with http/https means dev server is running - use real API
+                    const isLocalServer = (window.location.hostname === 'localhost' || 
+                                         window.location.hostname === '127.0.0.1') &&
+                                         (window.location.protocol === 'http:' || window.location.protocol === 'https:');
 
-                    if (isDevMode || isLocalDev) {
+                    // Only use mock responses for file:// protocol or explicit dev mode
+                    if (isDevMode || (isFileProtocol && !isLocalServer)) {
                         console.log('Using development mode - returning mock response');
                         return this.generateDevMockResponse(prompt);
                     }
@@ -1566,11 +1610,14 @@ IMPORTANT: SlangLang has unique syntax that differs significantly from common la
 SlangLang Language Specification:
 ${this.specContent || 'Specification not available'}
 
+${this.examplesContent ? `\nCode Examples:\n${this.examplesContent}\n` : ''}
+
 Your task is to generate valid SlangLang code based on user prompts. Follow these rules:
 1. Use proper SlangLang syntax and keywords from the specification above
-2. Make code readable and follow the language's conversational, Australian slang style
-3. Include comments using "oi" for line comments
-4. Ensure the code is syntactically correct according to the spec
+2. Study the examples above to understand real-world usage patterns
+3. Make code readable and follow the language's conversational, Australian slang style
+4. Include comments using "oi" for line comments
+5. Ensure the code is syntactically correct according to the spec
 5. Return ONLY the SlangLang code, no explanations, no markdown formatting, no code blocks
 
 Generate SlangLang code for the following request: ${prompt}`;

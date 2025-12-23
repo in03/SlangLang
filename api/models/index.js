@@ -75,7 +75,7 @@ export default async function handler(req, res) {
 
             // Ensure model is specified in request body (required for new endpoint)
             if (!body.model) {
-                body.model = 'gpt-4o'; // Default model
+                body.model = 'gpt-4o-mini'; // Default model
             }
 
             // Forward the request to GitHub Models API

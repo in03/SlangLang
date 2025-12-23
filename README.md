@@ -17,10 +17,24 @@ Try SlangLang in your browser with an interactive playground featuring AI-powere
 
 ### Development
 
+**Local Development with Codegen:**
+```bash
+# 1. Create .env file with your GitHub token
+echo "GITHUB_TOKEN=your_token_here" > .env
+
+# 2. Start dev server (builds playground automatically)
+bun run dev
+
+# 3. Open http://localhost:3000
+```
+
+**Static Build Only:**
 ```bash
 bun run build:playground
 # Then open playground/dist/index.html
 ```
+
+See `LOCAL_DEV.md` for detailed local development instructions.
 
 ### Production Deployment
 

@@ -3,7 +3,9 @@
   "version": "0.3.0",
   "description": "SlangLang - A programming language that's had a few too many",
   "scripts": {
-    "build:playground": "bun playground/build.js"
+    "build:playground": "bun playground/build.js",
+    "dev": "bun run build:playground && bun server.js",
+    "dev:server": "bun server.js"
   },
   "dependencies": {
     "moo": "^0.5.2",

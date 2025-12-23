@@ -44,7 +44,11 @@ function genExpr(expr) {
     case "Slice":
       return `${expr.target}.slice(${genExpr(expr.start)}, ${genExpr(expr.end)})`;
     case "ListExpr":
-      const items = expr.items.map(i => typeof i === "string" ? JSON.stringify(i) : i).join(", ");
+      const items = expr.items.map(i => {
+        if (typeof i === "string") return JSON.stringify(i);
+        if (typeof i === "object" && i.type) return genExpr(i);
+        return String(i);
+      }).join(", ");
       return `[${items}]`;
     case "DictExpr":
       const entries = expr.entries.map(([k, v]) => `${JSON.stringify(k)}: ${genExpr(v)}`).join(", ");
@@ -90,7 +94,11 @@ function compile(ast, level = 0) {
       }
       
       case "List": {
-        const listBody = node.items.map(i => genExpr(i)).join(", ");
+        const listBody = node.items.map(i => {
+          if (typeof i === "string") return JSON.stringify(i);
+          if (typeof i === "object" && i.type) return genExpr(i);
+          return String(i);
+        }).join(", ");
         return `let ${node.name} = [${listBody}];`;
       }
       

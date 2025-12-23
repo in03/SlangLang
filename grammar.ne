@@ -14,21 +14,32 @@ program -> topstatements {% id %}
 
 # Top-level statements can be separated by newlines or terminated by periods
 # Period acts like JavaScript semicolon - optional with indentation/newlines, required otherwise
-stmtend -> %NL {% id %}
+stmtend -> newlines {% id %}
         | %DOT {% id %}
-        | %DOT %NL {% id %}
+        | %DOT newlines {% id %}
 
+# CRITICAL: Fold multiple consecutive blank lines into a single statement terminator
+# This prevents parser confusion when multiple blank lines appear between statements.
+# Without this normalization, the parser can get confused about statement boundaries
+# and expect function definitions instead of assignments after blank lines.
+# Multiple blank lines are collapsed to a single newline for parsing purposes.
+# The recursive rule ensures all consecutive NLs are consumed but only one is returned.
+newlines -> %NL {% id %}
+          | newlines %NL {% d => d[0] %}  # Fold: consume extra NL but return only the first
+
+# Leading newlines at start of file (also folds multiple into one)
 leadingnl -> null {% d => null %}
-          | leadingnl %NL {% d => null %}
+          | %NL {% d => null %}
+          | leadingnl %NL {% d => null %}  # Fold: consume all leading NLs, return null
 
 topstatements -> leadingnl statement {% d => [d[1]] %}
               | topstatements stmtend statement {% d => [...d[0], d[2]] %}
               | topstatements stmtend {% d => d[0] %}
 
 statement -> printstmt {% id %}
+           | assignment {% id %}
            | funcdef {% id %}
            | returnstmt {% id %}
-           | assignment {% id %}
            | funccall {% id %}
            | eskydef {% id %}
            | tuckshopdef {% id %}
@@ -249,9 +260,9 @@ eskyitems -> eskyitem {% d => [d[0]] %}
           | eskyitems %COMMA eskyitem {% d => [...d[0], d[2]] %}
 
 eskyitem -> expr {% d => d[0] %}
-         | %BLOODY_ITEM {% d => d[0].value %}
-         | %NUMBER {% d => parseFloat(d[0].value) %}
-         | %STRING {% d => JSON.parse(d[0].value) %}
+         | %BLOODY_ITEM {% d => ({ type: "String", value: d[0].value }) %}
+         | %NUMBER {% d => ({ type: "Number", value: parseFloat(d[0].value) }) %}
+         | %STRING {% d => ({ type: "String", value: JSON.parse(d[0].value) }) %}
 
 # Inline esky expression: esky: item1, item2
 eskyexpr -> %KW_ESKY %COLON eskyitems {% 
