@@ -36,7 +36,7 @@ export default function handler(req, res) {
         authorizeUrl.searchParams.set('client_id', clientId);
         authorizeUrl.searchParams.set('scope', 'read:user');
         authorizeUrl.searchParams.set('state', state);
-        authorizeUrl.searchParams.set('redirect_uri', `${process.env.VERCEL_URL || 'http://localhost:3000'}/api/auth/callback`);
+        authorizeUrl.searchParams.set('redirect_uri', `${process.env.BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/auth/callback`);
 
         // Redirect to GitHub
         res.redirect(authorizeUrl.toString());

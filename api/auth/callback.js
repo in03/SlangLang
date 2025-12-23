@@ -38,7 +38,7 @@ export default async function handler(req, res) {
                 client_id: clientId,
                 client_secret: clientSecret,
                 code: code,
-                redirect_uri: `${process.env.VERCEL_URL || 'http://localhost:3000'}/api/auth/callback`
+                redirect_uri: `${process.env.BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/auth/callback`
             })
         });
 

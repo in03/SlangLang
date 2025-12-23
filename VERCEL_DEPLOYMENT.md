@@ -76,9 +76,29 @@ In Vercel project settings → Environment Variables:
 ```
 GITHUB_CLIENT_ID     = Ov23liFkjLahmnUTC6zA
 GITHUB_CLIENT_SECRET = your_secret_here
+BASE_URL             = https://slanglang.trevatt.co  # Optional: Override for custom domain
 ```
 
-### 4. Deploy
+### 4. Custom Domain Setup (Optional)
+
+To use a custom domain instead of the default Vercel domain:
+
+1. **Add Custom Domain in Vercel**:
+   - Go to your project settings in Vercel Dashboard
+   - Navigate to "Domains" tab
+   - Add your custom domain: `slanglang.trevatt.co`
+   - Follow Vercel's DNS configuration instructions
+
+2. **Update GitHub OAuth App**:
+   - Go to your GitHub OAuth App settings: https://github.com/settings/applications/[your-app-id]
+   - Update **Homepage URL**: `https://slanglang.trevatt.co`
+   - Update **Authorization callback URL**: `https://slanglang.trevatt.co/api/auth/callback`
+
+3. **Set BASE_URL Environment Variable** (Optional):
+   - If needed, set `BASE_URL=https://slanglang.trevatt.co` in Vercel environment variables
+   - This overrides the automatic `VERCEL_URL` detection
+
+### 5. Deploy
 
 Vercel will automatically deploy when you push to your main branch.
 
