@@ -1,6 +1,6 @@
 {
   "name": "slanglang",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "description": "SlangLang - A programming language that's had a few too many",
   "scripts": {
     "build:playground": "bun playground/build.js"

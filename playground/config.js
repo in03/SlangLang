@@ -13,8 +13,8 @@ const CONFIG = {
     // OAuth Scopes needed for GitHub Models
     OAUTH_SCOPES: 'read:user',
 
-    // GitHub Models API endpoint (preview)
-    MODELS_API_URL: 'https://api.github.com/models/gpt-4o-mini/chat/completions',
+    // GitHub Models API endpoint
+    MODELS_API_URL: 'https://models.github.ai/inference/chat/completions',
 
     // Development mode - set to true to bypass OAuth for local testing
     // WARNING: This uses mock responses, not real AI

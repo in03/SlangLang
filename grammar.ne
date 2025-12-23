@@ -83,21 +83,19 @@ funcdef -> %KW_PREP %IDENT %KW_BARBIE %KW_WITH paramlist block {%
 %}
 
 # New: greet on the barbie:
-funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %COLON block offbarbie:? {% 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %COLON block {% 
   d => ({ type: "Function", name: d[0], params: [], body: d[5] }) 
 %}
 
 # New: greet on the barbie with a, b:
-funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH commalist %COLON block offbarbie:? {% 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH commalist %COLON block {% 
   d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
 %}
 
 # New: greet on the barbie with a and b:
-funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block offbarbie:? {% 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block {% 
   d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
 %}
-
-offbarbie -> %KW_FAIR %KW_GO %DOT {% d => null %}
 
 commalist -> multiident {% d => [joinIdent(d[0])] %}
           | commalist %COMMA multiident {% d => [...d[0], joinIdent(d[2])] %}
@@ -127,7 +125,6 @@ compareexpr -> addexpr {% id %}
 addexpr -> mulexpr {% id %}
         | addexpr %KW_PLUS mulexpr {% d => ({ type: "BinOp", op: "+", left: d[0], right: d[2] }) %}
         | addexpr %KW_MINUS mulexpr {% d => ({ type: "BinOp", op: "-", left: d[0], right: d[2] }) %}
-        | addexpr %KW_FRIGGEN mulexpr {% d => ({ type: "Concat", left: d[0], right: d[2] }) %}
 
 mulexpr -> unaryexpr {% id %}
         | mulexpr %KW_TIMES unaryexpr {% d => ({ type: "BinOp", op: "*", left: d[0], right: d[2] }) %}
@@ -284,9 +281,9 @@ appendstmt -> %KW_ANOTHER %KW_SHRIMP %KW_IN %IDENT %DASH eskyitem %DOT {%
   d => ({ type: "Append", target: d[3].value, item: d[5] }) 
 %}
 
-# goodies top up <expr>
-topupstmt -> %IDENT %KW_TOP %KW_UP expr {% 
-  d => ({ type: "Append", target: d[0].value, item: d[3] }) 
+# goodies top up with <items>
+topupstmt -> %IDENT %KW_TOP %KW_UP %KW_WITH eskyitems {% 
+  d => ({ type: "Append", target: d[0].value, item: d[4] }) 
 %}
 
 # Ditch bloody chips from goodies.

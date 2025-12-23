@@ -7,8 +7,8 @@ const moo = require("moo");
 const KEYWORDS = {
   control:  ["if", "or", "otherwise", "make", "tracks"],
   loop:     ["scoffin", "dealin", "pass", "the", "from", "every", "in", "til", "fully", "sick", "full", "got"],
-  function: ["prep", "barbie", "with", "and", "fair", "go", "serve", "on", "off", "howbout"],
-    operator: ["is", "then", "tops", "cops", "equals", "not", "as", "plus", "minus", "times", "dividedby", "friggen"],
+  function: ["prep", "barbie", "with", "and", "fair", "go", "serve", "on", "howbout"],
+    operator: ["is", "then", "tops", "cops", "equals", "not", "as", "plus", "minus", "times", "dividedby"],
   type:     ["flamin", "frothin", "spewin", "esky", "tuckshop", "empty"],
   builtin:  ["crikey", "grab", "at", "chuck", "lot", "mates", "call", "bugger", "suss", "gimme",
              "another", "shrimp", "ditch", "drop", "last", "first", "snag", "sheepshear", "top", "up", "tossin", "noice", "oi"],
@@ -131,7 +131,6 @@ function createLexer() {
       KW_MINUS: kw("minus"),
       KW_TIMES: kw("times"),
       KW_DIVIDEDBY: kw("dividedby"),
-      KW_FRIGGEN: kw("friggen"),
       
       // Import keywords
       KW_CHUCK: kw("chuck"),
@@ -148,7 +147,6 @@ function createLexer() {
       
       // Function declaration (new syntax)
       KW_ON: kw("on"),
-      KW_OFF: kw("off"),
       
       // Comment keyword (for line-ending oi that didn't match LINE_COMMENT)
       KW_OI: kw("oi"),

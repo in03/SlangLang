@@ -15,7 +15,7 @@ const sourceLines = source.split(/\r?\n/);
 // Block context detection - maps opening constructs to their terminators
 const BLOCK_TERMINATORS = {
   // Pattern to match -> suggested terminator
-  "on the barbie": "off the barbie.",
+  "on the barbie": "fair go.",
   "scoffin": "who's full?",
   "dealin": "who's full?",
   "pass the": "who's got it?",
@@ -44,7 +44,7 @@ function findOpenBlock(lines, errorLine) {
     }
     
     // Check for block closers
-    const closers = ["off the barbie", "who's full", "who's got it", "fully sick", "make tracks"];
+    const closers = ["fair go", "who's full", "who's got it", "fully sick", "make tracks"];
     for (const closer of closers) {
       if (trimmed.includes(closer)) {
         // Pop matching block

@@ -101,7 +101,7 @@
       "patterns": [
         {
           "name": "keyword.operator.slang",
-          "match": "\\b(is|then|tops|cops|equals|not|plus|minus|times|dividedby)\\b"
+          "match": "\\b(is|then|tops|cops|equals|not|as|plus|minus|times|dividedby)\\b"
         },
         {
           "name": "keyword.operator.slang",
@@ -117,7 +117,7 @@
       "patterns": [
         {
           "name": "keyword.other.slang",
-          "match": "\\b(crikey|grab|at|chuck|lot|mates|call|bugger|suss|gimme|another|shrimp|ditch|drop|last|first|snag|sheepshear|top|up|oi)\\b"
+          "match": "\\b(crikey|grab|at|chuck|lot|mates|call|bugger|suss|gimme|another|shrimp|ditch|drop|last|first|snag|sheepshear|top|up|tossin|noice|oi)\\b"
         }
       ]
     },
@@ -137,7 +137,7 @@
       "patterns": [
         {
           "name": "keyword.function.slang",
-          "match": "\\b(prep|barbie|with|and|fair|go|serve|on|off|howbout)\\b"
+          "match": "\\b(prep|barbie|with|and|fair|go|serve|on|howbout)\\b"
         },
         {
           "name": "entity.name.function.slang",

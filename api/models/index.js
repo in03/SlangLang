@@ -37,11 +37,6 @@ export default async function handler(req, res) {
             const token = cookies.github_token;
             const tokenExpiry = cookies.github_token_expiry;
 
-            // Log for debugging (remove in production if needed)
-            if (process.env.NODE_ENV !== 'production') {
-                console.log('Cookies received:', Object.keys(cookies));
-            }
-
             if (!token || !tokenExpiry) {
                 return res.status(200).json({ authenticated: false });
             }
@@ -78,8 +73,14 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Invalid request body' });
             }
 
+            // Ensure model is specified in request body (required for new endpoint)
+            if (!body.model) {
+                body.model = 'gpt-4o'; // Default model
+            }
+
             // Forward the request to GitHub Models API
-            const modelsApiUrl = 'https://api.github.com/models/gpt-4o-mini/chat/completions';
+            // GitHub Models API endpoint: https://models.github.ai/inference/chat/completions
+            const modelsApiUrl = 'https://models.github.ai/inference/chat/completions';
 
             const response = await fetch(modelsApiUrl, {
                 method: 'POST',
@@ -101,6 +102,17 @@ export default async function handler(req, res) {
                     errorData = { error: errorText || 'GitHub API error' };
                 }
                 console.error('GitHub Models API error:', response.status, errorData);
+                
+                // Provide helpful error message for 404
+                if (response.status === 404) {
+                    return res.status(404).json({
+                        error: 'GitHub Models API endpoint not found',
+                        message: 'The GitHub Models API may not be available or you may not have access. GitHub Models API is a preview feature that requires special access.',
+                        details: errorData,
+                        suggestion: 'Please verify that you have access to GitHub Models API preview feature and that the endpoint URL is correct.'
+                    });
+                }
+                
                 return res.status(response.status).json({
                     error: errorData.error || errorData.message || 'GitHub Models API error',
                     details: errorData

@@ -64,22 +64,15 @@ var grammar = {
     {"name": "funcdef", "symbols": [(lexer.has("KW_PREP") ? {type: "KW_PREP"} : KW_PREP), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "paramlist", "block"], "postprocess":  
         d => ({ type: "Function", name: d[1].value, params: d[4], body: d[5] }) 
         },
-    {"name": "funcdef$ebnf$1", "symbols": ["offbarbie"], "postprocess": id},
-    {"name": "funcdef$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("COLON") ? {type: "COLON"} : COLON), "block", "funcdef$ebnf$1"], "postprocess":  
+    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("COLON") ? {type: "COLON"} : COLON), "block"], "postprocess":  
         d => ({ type: "Function", name: d[0], params: [], body: d[5] }) 
         },
-    {"name": "funcdef$ebnf$2", "symbols": ["offbarbie"], "postprocess": id},
-    {"name": "funcdef$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "commalist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block", "funcdef$ebnf$2"], "postprocess":  
+    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "commalist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block"], "postprocess":  
         d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
         },
-    {"name": "funcdef$ebnf$3", "symbols": ["offbarbie"], "postprocess": id},
-    {"name": "funcdef$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "paramlist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block", "funcdef$ebnf$3"], "postprocess":  
+    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "paramlist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block"], "postprocess":  
         d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
         },
-    {"name": "offbarbie", "symbols": [(lexer.has("KW_FAIR") ? {type: "KW_FAIR"} : KW_FAIR), (lexer.has("KW_GO") ? {type: "KW_GO"} : KW_GO), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": d => null},
     {"name": "commalist", "symbols": ["multiident"], "postprocess": d => [joinIdent(d[0])]},
     {"name": "commalist", "symbols": ["commalist", (lexer.has("COMMA") ? {type: "COMMA"} : COMMA), "multiident"], "postprocess": d => [...d[0], joinIdent(d[2])]},
     {"name": "paramlist", "symbols": ["multiident"], "postprocess": d => [joinIdent(d[0])]},
@@ -99,7 +92,6 @@ var grammar = {
     {"name": "addexpr", "symbols": ["mulexpr"], "postprocess": id},
     {"name": "addexpr", "symbols": ["addexpr", (lexer.has("KW_PLUS") ? {type: "KW_PLUS"} : KW_PLUS), "mulexpr"], "postprocess": d => ({ type: "BinOp", op: "+", left: d[0], right: d[2] })},
     {"name": "addexpr", "symbols": ["addexpr", (lexer.has("KW_MINUS") ? {type: "KW_MINUS"} : KW_MINUS), "mulexpr"], "postprocess": d => ({ type: "BinOp", op: "-", left: d[0], right: d[2] })},
-    {"name": "addexpr", "symbols": ["addexpr", (lexer.has("KW_FRIGGEN") ? {type: "KW_FRIGGEN"} : KW_FRIGGEN), "mulexpr"], "postprocess": d => ({ type: "Concat", left: d[0], right: d[2] })},
     {"name": "mulexpr", "symbols": ["unaryexpr"], "postprocess": id},
     {"name": "mulexpr", "symbols": ["mulexpr", (lexer.has("KW_TIMES") ? {type: "KW_TIMES"} : KW_TIMES), "unaryexpr"], "postprocess": d => ({ type: "BinOp", op: "*", left: d[0], right: d[2] })},
     {"name": "mulexpr", "symbols": ["mulexpr", (lexer.has("KW_DIVIDEDBY") ? {type: "KW_DIVIDEDBY"} : KW_DIVIDEDBY), "unaryexpr"], "postprocess": d => ({ type: "BinOp", op: "/", left: d[0], right: d[2] })},
@@ -199,8 +191,8 @@ var grammar = {
     {"name": "appendstmt", "symbols": [(lexer.has("KW_ANOTHER") ? {type: "KW_ANOTHER"} : KW_ANOTHER), (lexer.has("KW_SHRIMP") ? {type: "KW_SHRIMP"} : KW_SHRIMP), (lexer.has("KW_IN") ? {type: "KW_IN"} : KW_IN), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("DASH") ? {type: "DASH"} : DASH), "eskyitem", (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess":  
         d => ({ type: "Append", target: d[3].value, item: d[5] }) 
         },
-    {"name": "topupstmt", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_TOP") ? {type: "KW_TOP"} : KW_TOP), (lexer.has("KW_UP") ? {type: "KW_UP"} : KW_UP), "expr"], "postprocess":  
-        d => ({ type: "Append", target: d[0].value, item: d[3] }) 
+    {"name": "topupstmt", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_TOP") ? {type: "KW_TOP"} : KW_TOP), (lexer.has("KW_UP") ? {type: "KW_UP"} : KW_UP), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "eskyitems"], "postprocess":  
+        d => ({ type: "Append", target: d[0].value, item: d[4] }) 
         },
     {"name": "removestmt", "symbols": [(lexer.has("KW_DITCH") ? {type: "KW_DITCH"} : KW_DITCH), (lexer.has("BLOODY_ITEM") ? {type: "BLOODY_ITEM"} : BLOODY_ITEM), (lexer.has("KW_FROM") ? {type: "KW_FROM"} : KW_FROM), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess":  
         d => ({ type: "Remove", target: d[3].value, item: d[1].value }) 

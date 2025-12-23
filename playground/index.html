@@ -869,7 +869,7 @@
     <div class="header-content">
       <a href="#" class="logo">
         <h1>SlangLang</h1>
-        <span class="logo-tag">// v0.2.0 - probably buggy</span>
+        <span class="logo-tag">// v0.3.0 - Stable</span>
       </a>
       <div class="header-links">
         <a href="https://github.com/in03/slanglang" target="_blank" rel="noopener">src</a>
@@ -1377,11 +1377,14 @@ make tracks.`
                         const response = await fetch('./spec.md');
                         if (response.ok) {
                             this.specContent = await response.text();
+                            console.log('✅ Loaded spec.md (' + Math.round(this.specContent.length / 1024) + 'KB)');
                         } else {
-                            console.warn('Could not load spec.md');
+                            console.warn('⚠️ Could not load spec.md: HTTP ' + response.status);
+                            this.specContent = 'Specification file not available.';
                         }
                     } catch (error) {
-                        console.warn('Error loading spec.md:', error);
+                        console.warn('⚠️ Error loading spec.md:', error);
+                        this.specContent = 'Specification file not available.';
                     }
                 }
 
@@ -1553,15 +1556,22 @@ make tracks.`
 
                     const systemPrompt = `You are an expert programmer specializing in SlangLang, an Australian slang-inspired programming language.
 
+IMPORTANT: SlangLang has unique syntax that differs significantly from common languages. Pay close attention to:
+- Keywords are Australian slang (e.g., "crikey!" for print, "prep...barbie" for function)
+- Indentation is significant (like Python)
+- Multi-word identifiers are allowed (e.g., "the tasty tucker")
+- No semicolons or braces - use keywords and indentation
+- String literals use "bloody...mate" syntax (no quotes needed)
+
 SlangLang Language Specification:
 ${this.specContent || 'Specification not available'}
 
 Your task is to generate valid SlangLang code based on user prompts. Follow these rules:
-1. Use proper SlangLang syntax and keywords
-2. Make code readable and follow the language's conversational style
-3. Include comments to explain what the code does
-4. Ensure the code is syntactically correct
-5. Return ONLY the SlangLang code, no explanations or markdown formatting
+1. Use proper SlangLang syntax and keywords from the specification above
+2. Make code readable and follow the language's conversational, Australian slang style
+3. Include comments using "oi" for line comments
+4. Ensure the code is syntactically correct according to the spec
+5. Return ONLY the SlangLang code, no explanations, no markdown formatting, no code blocks
 
 Generate SlangLang code for the following request: ${prompt}`;
 
@@ -1578,6 +1588,7 @@ Generate SlangLang code for the following request: ${prompt}`;
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
+                            model: 'gpt-4o-mini',
                             messages: [
                                 {
                                     role: 'system',

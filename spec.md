@@ -1,6 +1,6 @@
 # SlangLang — Language Specification
 
-Version: 0.2 (Extended POC)
+Version: 0.3 (Stable)
 
 SlangLang is a playful, Australian‑slang‑inspired programming language designed to feel conversational, readable, and symbol‑light. It transpiles to JavaScript and executes via Bun or Node, while deliberately presenting itself as a distinct language with its own syntax, grammar, and tooling.
 
@@ -144,7 +144,6 @@ oi oi oi
 | `crikey`        | Print keyword (use with `!`)   |
 | `serve`         | Return keyword                 |
 | `fair` `go`     | Function block terminator      |
-| `friggen`       | String concat with space       |
 | `yeah`          | Boolean true                   |
 | `nah`           | Boolean false                  |
 | `nothin`        | Null literal                   |
@@ -221,8 +220,8 @@ oi oi oi
 | `first`     | First element specifier    |
 | `snag`      | Element noun               |
 | `sheepshear`| Slice operation            |
-| `top`       | Append alternative start (legacy) |
-| `up`        | Append alternative part (legacy) |
+| `top`       | Append operation start           |
+| `up`        | Append operation part            |
 | `grab`      | Index/key access           |
 | `at`        | Access specifier           |
 
@@ -421,24 +420,6 @@ console.log(clean);  // "HELLO WORLD"
 | `dividedby` | `/`    | `x dividedby y`      |
 
 Note: `plus` works on both numbers and strings (uses JS `+` operator).
-
-### String Concatenation with Space
-
-The `friggen` keyword concatenates strings with an automatic space between them:
-
-```slang
-name is "Bruce"
-Crikey! "Gday" friggen name friggen "welcome!"
-```
-
-Compiles to:
-
-```js
-let name = "Bruce";
-console.log("Gday" + " " + name + " " + "welcome!");  // "Gday Bruce welcome!"
-```
-
-This is perfect for building natural sentences without manually adding spaces.
 
 ### Comparison Operators
 
@@ -687,6 +668,14 @@ tossin menu:
   available as yeah
 noice.
 ```
+
+**Top Up (Append Multiple Items):**
+
+```slang
+goodies top up with bloody chips, bloody sauce, flamin plates.
+```
+
+Appends multiple items to a list in a single statement.
 
 **Remove:**
 
@@ -967,8 +956,8 @@ Planned enhancements:
 * ✅ Exception handling (bugger, suss)
 * ✅ Spewin as float/length keyword
 * ✅ Serve as return keyword
-* ✅ Friggen for string concatenation with space
 * ✅ Multi-word identifier support
+* ✅ Top up with syntax for appending multiple items
 * ✅ Comments (oi line, aussie aussie aussie block)
 * ✅ New function syntax (on the barbie)
 * ✅ Optional block terminators
