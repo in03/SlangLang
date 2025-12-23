@@ -5,6 +5,10 @@
   "scripts": {
     "build:playground": "bun playground/build.js"
   },
+  "dependencies": {
+    "moo": "^0.5.2",
+    "nearley": "^2.20.1"
+  },
   "devDependencies": {
     "bun": "^1.0.0"
   },
