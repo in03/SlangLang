@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "@vercel/bun@1.0.0"
-    }
-  },
+  "bunVersion": "1.x",
   "outputDirectory": "playground/dist"
 }
