@@ -1,0 +1,1 @@
+final_price is howbout calculate_total_price with 100 and 1.1

@@ -43,6 +43,10 @@ function genExpr(expr) {
       return `${expr.target}${idx}`;
     case "Slice":
       return `${expr.target}.slice(${genExpr(expr.start)}, ${genExpr(expr.end)})`;
+    case "Pop":
+      return expr.position === "first"
+        ? `${expr.target}.shift()`
+        : `${expr.target}.pop()`;
     case "ListExpr":
       const items = expr.items.map(i => {
         if (typeof i === "string") return JSON.stringify(i);

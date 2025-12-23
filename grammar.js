@@ -14,8 +14,6 @@ var grammar = {
     Lexer: lexer,
     ParserRules: [
     {"name": "program", "symbols": ["topstatements"], "postprocess": id},
-    {"name": "comment", "symbols": [(lexer.has("LINE_COMMENT") ? {type: "LINE_COMMENT"} : LINE_COMMENT)], "postprocess": d => null},
-    {"name": "comment", "symbols": [(lexer.has("BLOCK_COMMENT") ? {type: "BLOCK_COMMENT"} : BLOCK_COMMENT)], "postprocess": d => null},
     {"name": "stmtend", "symbols": [(lexer.has("NL") ? {type: "NL"} : NL)], "postprocess": id},
     {"name": "stmtend", "symbols": [(lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": id},
     {"name": "leadingnl", "symbols": [], "postprocess": d => null},
@@ -23,7 +21,6 @@ var grammar = {
     {"name": "leadingnl", "symbols": ["leadingnl", (lexer.has("NL") ? {type: "NL"} : NL)], "postprocess": d => null},
     {"name": "topstatements", "symbols": ["leadingnl", "statement"], "postprocess": d => [d[1]]},
     {"name": "topstatements", "symbols": ["topstatements", "stmtend", "statement"], "postprocess": d => [...d[0], d[2]]},
-    {"name": "topstatements", "symbols": ["topstatements", "stmtend", "comment"], "postprocess": d => d[0]},
     {"name": "topstatements", "symbols": ["topstatements", "stmtend"], "postprocess": d => d[0]},
     {"name": "statement", "symbols": ["printstmt"], "postprocess": id},
     {"name": "statement", "symbols": ["assignment"], "postprocess": id},
@@ -123,6 +120,7 @@ var grammar = {
     {"name": "primary", "symbols": ["frothinexpr"], "postprocess": id},
     {"name": "primary", "symbols": ["spewinexpr"], "postprocess": id},
     {"name": "primary", "symbols": ["grabexpr"], "postprocess": id},
+    {"name": "primary", "symbols": ["dropexpr"], "postprocess": id},
     {"name": "primary", "symbols": ["funccallexpr"], "postprocess": id},
     {"name": "primary", "symbols": ["eskyexpr"], "postprocess": id},
     {"name": "primary", "symbols": ["tuckshopexpr"], "postprocess": id},
@@ -153,8 +151,8 @@ var grammar = {
         d => ({ type: "Number", value: parseFloat(d[1].value) }) 
         },
     {"name": "emptyexpr", "symbols": [(lexer.has("KW_EMPTY") ? {type: "KW_EMPTY"} : KW_EMPTY)], "postprocess": d => ({ type: "Empty" })},
-    {"name": "assignment", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), "expr"], "postprocess":  
-        d => ({ type: "Assign", name: d[0].value, value: d[2] }) 
+    {"name": "assignment", "symbols": ["identword", (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), "expr"], "postprocess": 
+        d => ({ type: "Assign", name: d[0], value: d[2] })
         },
     {"name": "reassignment", "symbols": [(lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_IS") ? {type: "KW_IS"} : KW_IS), (lexer.has("KW_EMPTY") ? {type: "KW_EMPTY"} : KW_EMPTY)], "postprocess":  
         d => ({ type: "Reassign", name: d[0].value, value: { type: "Empty" } }) 
@@ -210,8 +208,14 @@ var grammar = {
     {"name": "popstmt", "symbols": [(lexer.has("KW_DROP") ? {type: "KW_DROP"} : KW_DROP), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_LAST") ? {type: "KW_LAST"} : KW_LAST), (lexer.has("KW_SNAG") ? {type: "KW_SNAG"} : KW_SNAG), (lexer.has("KW_FROM") ? {type: "KW_FROM"} : KW_FROM), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess":  
         d => ({ type: "Pop", target: d[5].value, position: "last" }) 
         },
-    {"name": "popstmt", "symbols": [(lexer.has("KW_DROP") ? {type: "KW_DROP"} : KW_DROP), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_FIRST") ? {type: "KW_FIRST"} : KW_FIRST), (lexer.has("KW_SNAG") ? {type: "KW_SNAG"} : KW_SNAG), (lexer.has("KW_FROM") ? {type: "KW_FROM"} : KW_FROM), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess":  
-        d => ({ type: "Pop", target: d[5].value, position: "first" }) 
+    {"name": "popstmt", "symbols": [(lexer.has("KW_DROP") ? {type: "KW_DROP"} : KW_DROP), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_FIRST") ? {type: "KW_FIRST"} : KW_FIRST), (lexer.has("KW_SNAG") ? {type: "KW_SNAG"} : KW_SNAG), (lexer.has("KW_FROM") ? {type: "KW_FROM"} : KW_FROM), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": 
+        d => ({ type: "Pop", target: d[5].value, position: "first" })
+        },
+    {"name": "dropexpr", "symbols": [(lexer.has("KW_DROP") ? {type: "KW_DROP"} : KW_DROP), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_LAST") ? {type: "KW_LAST"} : KW_LAST), (lexer.has("KW_SNAG") ? {type: "KW_SNAG"} : KW_SNAG), (lexer.has("KW_FROM") ? {type: "KW_FROM"} : KW_FROM), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT)], "postprocess": 
+        d => ({ type: "Pop", target: d[5].value, position: "last" })
+        },
+    {"name": "dropexpr", "symbols": [(lexer.has("KW_DROP") ? {type: "KW_DROP"} : KW_DROP), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_FIRST") ? {type: "KW_FIRST"} : KW_FIRST), (lexer.has("KW_SNAG") ? {type: "KW_SNAG"} : KW_SNAG), (lexer.has("KW_FROM") ? {type: "KW_FROM"} : KW_FROM), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT)], "postprocess": 
+        d => ({ type: "Pop", target: d[5].value, position: "first" })
         },
     {"name": "grabexpr", "symbols": [(lexer.has("KW_GRAB") ? {type: "KW_GRAB"} : KW_GRAB), "expr", (lexer.has("KW_FROM") ? {type: "KW_FROM"} : KW_FROM), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT)], "postprocess":  
         d => ({ type: "Index", target: d[3].value, index: d[1] }) 
@@ -290,7 +294,6 @@ var grammar = {
     {"name": "block", "symbols": [(lexer.has("INDENT") ? {type: "INDENT"} : INDENT), "statements", (lexer.has("DEDENT") ? {type: "DEDENT"} : DEDENT)], "postprocess": d => d[1]},
     {"name": "statements", "symbols": ["statement"], "postprocess": d => [d[0]]},
     {"name": "statements", "symbols": ["statements", "stmtend", "statement"], "postprocess": d => [...d[0], d[2]]},
-    {"name": "statements", "symbols": ["statements", "stmtend", "comment"], "postprocess": d => d[0]},
     {"name": "statements", "symbols": ["statements", "stmtend"], "postprocess": d => d[0]}
 ]
   , ParserStart: "program"

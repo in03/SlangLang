@@ -12,9 +12,7 @@ function joinIdent(parts) {
 
 program -> topstatements {% id %}
 
-# Comments (line comments starting with "oi" and block comments)
-comment -> %LINE_COMMENT {% d => null %}
-         | %BLOCK_COMMENT {% d => null %}
+# Comments are handled by the lexer (skipped)
 
 # Top-level statements can be separated by newlines or terminated by periods
 # Period acts like JavaScript semicolon - optional with indentation/newlines, required otherwise
@@ -28,7 +26,6 @@ leadingnl -> null {% d => null %}
 
 topstatements -> leadingnl statement {% d => [d[1]] %}
                | topstatements stmtend statement {% d => [...d[0], d[2]] %}
-               | topstatements stmtend comment {% d => d[0] %}
                | topstatements stmtend {% d => d[0] %}
 
 statement -> printstmt {% id %}
@@ -161,6 +158,7 @@ primary -> %BOOL {% d => ({ type:"Bool", value: d[0].value === "yeah" }) %}
      | frothinexpr {% id %}
      | spewinexpr {% id %}
      | grabexpr {% id %}
+     | dropexpr {% id %}
      | funccallexpr {% id %}
      | eskyexpr {% id %}
      | tuckshopexpr {% id %}
@@ -211,9 +209,9 @@ spewinexpr -> %KW_SPEWIN %NUMBER {%
 emptyexpr -> %KW_EMPTY {% d => ({ type: "Empty" }) %}
 
 # ============ ASSIGNMENT ============
-# name is <expr> (single-word identifier for simplicity in expressions)
-assignment -> %IDENT %KW_IS expr {% 
-  d => ({ type: "Assign", name: d[0].value, value: d[2] }) 
+# name is <expr> (identifier can be keyword or regular ident)
+assignment -> identword %KW_IS expr {%
+  d => ({ type: "Assign", name: d[0], value: d[2] })
 %}
 
 # Reassignment (for existing variables, e.g., "goodies is empty")
@@ -306,8 +304,17 @@ popstmt -> %KW_DROP %KW_THE %KW_LAST %KW_SNAG %KW_FROM %IDENT %DOT {%
 %}
 
 # drop the first snag from goodies.
-popstmt -> %KW_DROP %KW_THE %KW_FIRST %KW_SNAG %KW_FROM %IDENT %DOT {% 
-  d => ({ type: "Pop", target: d[5].value, position: "first" }) 
+popstmt -> %KW_DROP %KW_THE %KW_FIRST %KW_SNAG %KW_FROM %IDENT %DOT {%
+  d => ({ type: "Pop", target: d[5].value, position: "first" })
+%}
+
+# Drop expressions (return popped value)
+dropexpr -> %KW_DROP %KW_THE %KW_LAST %KW_SNAG %KW_FROM %IDENT {%
+  d => ({ type: "Pop", target: d[5].value, position: "last" })
+%}
+
+dropexpr -> %KW_DROP %KW_THE %KW_FIRST %KW_SNAG %KW_FROM %IDENT {%
+  d => ({ type: "Pop", target: d[5].value, position: "first" })
 %}
 
 # ============ GRAB (INDEX/KEY ACCESS) ============
@@ -439,5 +446,4 @@ block -> %INDENT statements %DEDENT {% d => d[1] %}
 
 statements -> statement {% d => [d[0]] %}
             | statements stmtend statement {% d => [...d[0], d[2]] %}
-            | statements stmtend comment {% d => d[0] %}
             | statements stmtend {% d => d[0] %}
