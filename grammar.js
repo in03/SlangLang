@@ -64,15 +64,22 @@ var grammar = {
     {"name": "funcdef", "symbols": [(lexer.has("KW_PREP") ? {type: "KW_PREP"} : KW_PREP), (lexer.has("IDENT") ? {type: "IDENT"} : IDENT), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "paramlist", "block"], "postprocess":  
         d => ({ type: "Function", name: d[1].value, params: d[4], body: d[5] }) 
         },
-    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("COLON") ? {type: "COLON"} : COLON), "block"], "postprocess":  
+    {"name": "funcdef$ebnf$1", "symbols": ["fairgo"], "postprocess": id},
+    {"name": "funcdef$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("COLON") ? {type: "COLON"} : COLON), "block", "funcdef$ebnf$1"], "postprocess":  
         d => ({ type: "Function", name: d[0], params: [], body: d[5] }) 
         },
-    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "commalist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block"], "postprocess":  
+    {"name": "funcdef$ebnf$2", "symbols": ["fairgo"], "postprocess": id},
+    {"name": "funcdef$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "commalist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block", "funcdef$ebnf$2"], "postprocess":  
         d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
         },
-    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "paramlist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block"], "postprocess":  
+    {"name": "funcdef$ebnf$3", "symbols": ["fairgo"], "postprocess": id},
+    {"name": "funcdef$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "funcdef", "symbols": ["identword", (lexer.has("KW_ON") ? {type: "KW_ON"} : KW_ON), (lexer.has("KW_THE") ? {type: "KW_THE"} : KW_THE), (lexer.has("KW_BARBIE") ? {type: "KW_BARBIE"} : KW_BARBIE), (lexer.has("KW_WITH") ? {type: "KW_WITH"} : KW_WITH), "paramlist", (lexer.has("COLON") ? {type: "COLON"} : COLON), "block", "funcdef$ebnf$3"], "postprocess":  
         d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
         },
+    {"name": "fairgo", "symbols": [(lexer.has("KW_FAIR") ? {type: "KW_FAIR"} : KW_FAIR), (lexer.has("KW_GO") ? {type: "KW_GO"} : KW_GO), (lexer.has("DOT") ? {type: "DOT"} : DOT)], "postprocess": d => null},
     {"name": "commalist", "symbols": ["multiident"], "postprocess": d => [joinIdent(d[0])]},
     {"name": "commalist", "symbols": ["commalist", (lexer.has("COMMA") ? {type: "COMMA"} : COMMA), "multiident"], "postprocess": d => [...d[0], joinIdent(d[2])]},
     {"name": "paramlist", "symbols": ["multiident"], "postprocess": d => [joinIdent(d[0])]},

@@ -83,19 +83,22 @@ funcdef -> %KW_PREP %IDENT %KW_BARBIE %KW_WITH paramlist block {%
 %}
 
 # New: greet on the barbie:
-funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %COLON block {% 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %COLON block fairgo:? {% 
   d => ({ type: "Function", name: d[0], params: [], body: d[5] }) 
 %}
 
 # New: greet on the barbie with a, b:
-funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH commalist %COLON block {% 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH commalist %COLON block fairgo:? {% 
   d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
 %}
 
 # New: greet on the barbie with a and b:
-funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block {% 
+funcdef -> identword %KW_ON %KW_THE %KW_BARBIE %KW_WITH paramlist %COLON block fairgo:? {% 
   d => ({ type: "Function", name: d[0], params: d[5], body: d[7] }) 
 %}
+
+# Optional "fair go." terminator
+fairgo -> %KW_FAIR %KW_GO %DOT {% d => null %}
 
 commalist -> multiident {% d => [joinIdent(d[0])] %}
           | commalist %COMMA multiident {% d => [...d[0], joinIdent(d[2])] %}
