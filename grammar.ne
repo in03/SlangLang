@@ -12,20 +12,14 @@ function joinIdent(parts) {
 
 program -> topstatements {% id %}
 
+# Comments (line comments starting with "oi" and block comments)
+comment -> %LINE_COMMENT {% d => null %}
+         | %BLOCK_COMMENT {% d => null %}
+
 # Top-level statements can be separated by newlines or terminated by periods
 # Period acts like JavaScript semicolon - optional with indentation/newlines, required otherwise
-stmtend -> newlines {% id %}
+stmtend -> %NL {% id %}
         | %DOT {% id %}
-        | %DOT newlines {% id %}
-
-# CRITICAL: Fold multiple consecutive blank lines into a single statement terminator
-# This prevents parser confusion when multiple blank lines appear between statements.
-# Without this normalization, the parser can get confused about statement boundaries
-# and expect function definitions instead of assignments after blank lines.
-# Multiple blank lines are collapsed to a single newline for parsing purposes.
-# The recursive rule ensures all consecutive NLs are consumed but only one is returned.
-newlines -> %NL {% id %}
-          | newlines %NL {% d => d[0] %}  # Fold: consume extra NL but return only the first
 
 # Leading newlines at start of file (also folds multiple into one)
 leadingnl -> null {% d => null %}
@@ -33,8 +27,9 @@ leadingnl -> null {% d => null %}
           | leadingnl %NL {% d => null %}  # Fold: consume all leading NLs, return null
 
 topstatements -> leadingnl statement {% d => [d[1]] %}
-              | topstatements stmtend statement {% d => [...d[0], d[2]] %}
-              | topstatements stmtend {% d => d[0] %}
+               | topstatements stmtend statement {% d => [...d[0], d[2]] %}
+               | topstatements stmtend comment {% d => d[0] %}
+               | topstatements stmtend {% d => d[0] %}
 
 statement -> printstmt {% id %}
            | assignment {% id %}
@@ -301,8 +296,8 @@ topupstmt -> %IDENT %KW_TOP %KW_UP %KW_WITH eskyitems {%
 %}
 
 # Ditch bloody chips from goodies.
-removestmt -> %KW_DITCH %BLOODY_ITEM %KW_FROM %IDENT %DOT {% 
-  d => ({ type: "Remove", target: d[3].value, item: d[1].value }) 
+removestmt -> %KW_DITCH eskyitem %KW_FROM %IDENT %DOT {%
+  d => ({ type: "Remove", target: d[3].value, item: d[1] })
 %}
 
 # drop the last snag from goodies.
@@ -443,5 +438,6 @@ gimmestmt -> %KW_GIMME multiident %DOT {%
 block -> %INDENT statements %DEDENT {% d => d[1] %}
 
 statements -> statement {% d => [d[0]] %}
-           | statements stmtend statement {% d => [...d[0], d[2]] %}
-           | statements stmtend {% d => d[0] %}
+            | statements stmtend statement {% d => [...d[0], d[2]] %}
+            | statements stmtend comment {% d => d[0] %}
+            | statements stmtend {% d => d[0] %}

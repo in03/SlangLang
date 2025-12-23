@@ -1594,7 +1594,7 @@ make tracks.`
                         // Re-check auth status in case it changed
                         await this.checkAuthStatus();
                         if (!this.isAuthenticated) {
-                            throw new Error('Not authenticated');
+                        throw new Error('Not authenticated');
                         }
                     }
 

@@ -9,6 +9,12 @@
 **Fix Applied**: Updated grammar.ne to convert BLOODY_ITEM to String expression object
 **Compiler Fix**: Updated compiler.js to handle string/object/primitive items in lists
 
+### 6. ✅ FIXED - Parser: Comment handling causing infinite hang
+**Issue**: Comments (oi ...) were not handled in grammar.ne, causing parser to hang with out-of-memory errors
+**Root Cause**: Lexer produces LINE_COMMENT tokens but grammar had no rules to consume them
+**Fix Applied**: Added comment rules to grammar.ne and modified statement rules to allow comments between statements
+**Status**: Fixed - all examples now compile successfully in build process
+
 ### 2. ✅ FIXED - Parser: Blank line confusion
 **File**: `02_expressions.slang` line 23
 **Issue**: Parser expected function definition after blank line instead of assignment
@@ -119,6 +125,7 @@ All identified architectural bugs have been **successfully fixed**:
 2. ✅ **Blank Line Parser Confusion** - Fixed by normalizing multiple consecutive blank lines into a single terminator
 3. ✅ **Multi-word Function Names** - Enabled by using `multiident` in function definitions
 4. ✅ **Compiler Expression Handling** - Fixed AST node creation for primitives
+5. ✅ **Comment Parsing** - Added grammar rules to handle "oi" comments, preventing infinite loops
 
 The language now correctly handles all core features as specified. The fix for blank lines was elegantly solved by adding a normalization rule that folds multiple consecutive blank lines into one, preventing parser ambiguity without requiring major grammar redesign.
 
