@@ -98,11 +98,29 @@ export default async function handler(req, res) {
         // Store token securely in HTTP-only cookie
         // In production, encrypt the token or use a session store
         const tokenExpiry = new Date(Date.now() + 8 * 60 * 60 * 1000); // 8 hours
+        const expiryTimestamp = tokenExpiry.getTime();
 
-        res.setHeader('Set-Cookie', [
-            `github_token=${tokenData.access_token}; HttpOnly; Secure; Path=/; Expires=${tokenExpiry.toUTCString()}; SameSite=Lax`,
-            `github_token_expiry=${tokenExpiry.getTime()}; HttpOnly; Secure; Path=/; Expires=${tokenExpiry.toUTCString()}; SameSite=Lax`
-        ]);
+        // Set cookies with proper attributes for cross-domain support
+        // SameSite=Lax allows cookies to be sent on top-level navigations (like OAuth redirects)
+        const cookieOptions = [
+            `github_token=${tokenData.access_token}`,
+            `HttpOnly`,
+            `Secure`, // Only send over HTTPS
+            `Path=/`,
+            `Expires=${tokenExpiry.toUTCString()}`,
+            `SameSite=Lax` // Allows cookies on redirects
+        ].join('; ');
+
+        const expiryCookieOptions = [
+            `github_token_expiry=${expiryTimestamp}`,
+            `HttpOnly`,
+            `Secure`,
+            `Path=/`,
+            `Expires=${tokenExpiry.toUTCString()}`,
+            `SameSite=Lax`
+        ].join('; ');
+
+        res.setHeader('Set-Cookie', [cookieOptions, expiryCookieOptions]);
 
         // Redirect back to the main app
         res.redirect('/');

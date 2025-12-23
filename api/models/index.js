@@ -16,12 +16,16 @@ function parseCookies(cookieHeader) {
 // Helper function to get cookies from request
 function getCookies(req) {
     // Try req.cookies first (if Vercel provides it)
-    if (req.cookies) {
+    if (req.cookies && typeof req.cookies === 'object') {
         return req.cookies;
     }
     
     // Otherwise parse from Cookie header
-    const cookieHeader = req.headers?.cookie || req.headers?.get?.('cookie');
+    // Vercel/Bun may have cookies in different formats
+    const cookieHeader = req.headers?.cookie || 
+                        req.headers?.get?.('cookie') ||
+                        (typeof req.headers === 'object' && req.headers.Cookie) ||
+                        '';
     return parseCookies(cookieHeader);
 }
 
@@ -33,14 +37,25 @@ export default async function handler(req, res) {
             const token = cookies.github_token;
             const tokenExpiry = cookies.github_token_expiry;
 
-            if (!token || !tokenExpiry || Date.now() > parseInt(tokenExpiry)) {
-                return res.status(401).json({ authenticated: false });
+            // Log for debugging (remove in production if needed)
+            if (process.env.NODE_ENV !== 'production') {
+                console.log('Cookies received:', Object.keys(cookies));
+            }
+
+            if (!token || !tokenExpiry) {
+                return res.status(200).json({ authenticated: false });
+            }
+
+            // Check if token is expired
+            const expiryTime = parseInt(tokenExpiry, 10);
+            if (isNaN(expiryTime) || Date.now() > expiryTime) {
+                return res.status(200).json({ authenticated: false });
             }
 
             return res.status(200).json({ authenticated: true });
         } catch (error) {
             console.error('GET /api/models error:', error);
-            return res.status(500).json({ error: 'Internal server error' });
+            return res.status(200).json({ authenticated: false });
         }
     }
 
@@ -76,10 +91,26 @@ export default async function handler(req, res) {
                 body: JSON.stringify(body)
             });
 
+            // Handle non-OK responses
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorData;
+                try {
+                    errorData = JSON.parse(errorText);
+                } catch (e) {
+                    errorData = { error: errorText || 'GitHub API error' };
+                }
+                console.error('GitHub Models API error:', response.status, errorData);
+                return res.status(response.status).json({
+                    error: errorData.error || errorData.message || 'GitHub Models API error',
+                    details: errorData
+                });
+            }
+
             const data = await response.json();
 
             // Return the response to the client
-            return res.status(response.status).json(data);
+            return res.status(200).json(data);
         } catch (error) {
             console.error('POST /api/models error:', error);
             return res.status(500).json({ error: 'Internal server error' });

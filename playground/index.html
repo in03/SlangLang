@@ -1411,12 +1411,23 @@ make tracks.`
                             const data = await response.json();
                             this.isAuthenticated = data.authenticated || false;
                         } else {
+                            // If we get 401, 500, or any other error, user is not authenticated
                             this.isAuthenticated = false;
+                            // Try to parse error response for debugging
+                            try {
+                                const errorData = await response.json();
+                                console.log('Auth check error:', errorData);
+                            } catch (e) {
+                                // Ignore JSON parse errors
+                            }
                         }
                     } catch (error) {
                         console.error('Auth check failed:', error);
                         this.isAuthenticated = false;
                     }
+                    
+                    // Always update UI after checking auth status
+                    this.updateAuthUI();
                 }
 
                 // Device flow doesn't need OAuth callback handling
@@ -1497,10 +1508,10 @@ make tracks.`
                         console.error('Error generating code:', error);
 
                         let errorMessage = 'Failed to generate code. ';
-                        if (error.message.includes('Not authenticated')) {
+                        if (error.message.includes('Not authenticated') || error.message.includes('401')) {
                             errorMessage += 'Please sign in with GitHub first.';
-                        } else if (error.message.includes('401')) {
-                            errorMessage += 'Authentication failed. Please sign in again.';
+                            // Re-check auth status and update UI
+                            await this.checkAuthStatus();
                         } else if (error.message.includes('403')) {
                             errorMessage += 'Access denied. You may not have permission to use GitHub Models.';
                         } else if (error.message.includes('429')) {
@@ -1531,8 +1542,13 @@ make tracks.`
                         return this.generateDevMockResponse(prompt);
                     }
 
-                    if (!this.githubToken) {
-                        throw new Error('Not authenticated');
+                    // Check authentication status before making API call
+                    if (!this.isAuthenticated) {
+                        // Re-check auth status in case it changed
+                        await this.checkAuthStatus();
+                        if (!this.isAuthenticated) {
+                            throw new Error('Not authenticated');
+                        }
                     }
 
                     const systemPrompt = `You are an expert programmer specializing in SlangLang, an Australian slang-inspired programming language.
