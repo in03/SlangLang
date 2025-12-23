@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "SlangLang - A programming language that's had a few too many",
   "scripts": {
-    "build:playground": "node playground/build.js"
+    "build:playground": "bun playground/build.js"
   },
   "devDependencies": {
     "bun": "^1.0.0"
