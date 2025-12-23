@@ -1,3 +1,46 @@
+const { createHmac } = require('crypto');
+
+// Verify signed state token (stateless CSRF protection)
+function verifyState(state) {
+    if (!state || typeof state !== 'string') {
+        return false;
+    }
+    
+    const parts = state.split('.');
+    if (parts.length !== 2) {
+        return false;
+    }
+    
+    const [payload, signature] = parts;
+    const [timestampStr] = payload.split(':');
+    const timestamp = parseInt(timestampStr, 10);
+    
+    // Check if state is expired (older than 10 minutes)
+    const maxAge = 10 * 60 * 1000; // 10 minutes
+    if (Date.now() - timestamp > maxAge) {
+        console.error('State expired:', timestamp);
+        return false;
+    }
+    
+    // Verify signature
+    const secret = process.env.GITHUB_CLIENT_SECRET || 'default-secret-change-in-production';
+    const expectedSignature = createHmac('sha256', secret)
+        .update(payload)
+        .digest('hex');
+    
+    // Use timing-safe comparison to prevent timing attacks
+    if (signature.length !== expectedSignature.length) {
+        return false;
+    }
+    
+    let match = 0;
+    for (let i = 0; i < signature.length; i++) {
+        match |= signature.charCodeAt(i) ^ expectedSignature.charCodeAt(i);
+    }
+    
+    return match === 0;
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -10,14 +53,11 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing code or state parameter' });
         }
 
-        // Validate state for CSRF protection
-        if (!global.stateStore || !global.stateStore.has(state)) {
+        // Validate signed state for CSRF protection (stateless)
+        if (!verifyState(state)) {
             console.error('Invalid or expired state:', state);
             return res.status(400).json({ error: 'Invalid state parameter' });
         }
-
-        // Remove used state
-        global.stateStore.delete(state);
 
         const clientId = process.env.GITHUB_CLIENT_ID;
         const clientSecret = process.env.GITHUB_CLIENT_SECRET;
@@ -25,6 +65,12 @@ export default async function handler(req, res) {
         if (!clientId || !clientSecret) {
             console.error('GitHub OAuth credentials not configured');
             return res.status(500).json({ error: 'OAuth configuration missing' });
+        }
+
+        // Get base URL and ensure it has a protocol
+        let baseUrl = process.env.BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+            baseUrl = `https://${baseUrl}`;
         }
 
         // Exchange code for access token
@@ -38,7 +84,7 @@ export default async function handler(req, res) {
                 client_id: clientId,
                 client_secret: clientSecret,
                 code: code,
-                redirect_uri: `${process.env.BASE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/auth/callback`
+                redirect_uri: `${baseUrl}/api/auth/callback`
             })
         });
 
