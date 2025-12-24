@@ -1662,25 +1662,37 @@ make tracks.`
 
                     const systemPrompt = `You are an expert programmer specializing in SlangLang, an Australian slang-inspired programming language.
 
-IMPORTANT: SlangLang has unique syntax that differs significantly from common languages. Pay close attention to:
-- Keywords are Australian slang (e.g., "crikey!" for print, "prep...barbie" for function)
-- Indentation is significant (like Python)
-- Multi-word identifiers are allowed (e.g., "the tasty tucker")
+${this.examplesContent ? `CODE EXAMPLES - STUDY THESE FIRST:\n${this.examplesContent}\n` : ''}
+
+SLANGLANG SYNTAX BASICS:
+- Keywords are Australian slang (e.g., "crikey!" for print, "on the barbie" for functions)
+- Indentation defines structure (like Python)
+- Multi-word identifiers allowed (e.g., "the tasty tucker")
 - No semicolons or braces - use keywords and indentation
-- String literals use "bloody...mate" syntax (no quotes needed)
+- Functions: "name on the barbie with params:" and end with "fair go."
+- Strings: bloody content mate (preferred) or "quoted strings"
+- Comments: "oi" for single line, "aussie aussie aussie" / "oi oi oi" for blocks
+- ARITHMETIC: Use direct operators (plus, minus, times, dividedby) between expressions
+- METHOD CHAINING: Use "then method_name" only with valid method names (not arithmetic operators)
 
-SlangLang Language Specification:
-${this.specContent || 'Specification not available'}
+CRITICAL SYNTAX RULES:
+- ❌ DON'T use "then plus/minus/times/dividedby" - these are binary operators, not methods
+- ✅ DO use direct arithmetic: "a plus b", "x minus y", "result times factor"
+- ✅ DO use method chaining for actual methods: "text then to upper case", "list then slice with 0, 5"
+- ✅ COMPARISONS: Use "equals" or "is" for equality, "tops"/"cops" for greater/less than
+- ✅ CONDITIONALS: "if condition," then block, end with "make tracks."
 
-${this.examplesContent ? `\nCode Examples:\n${this.examplesContent}\n` : ''}
+IDIOMATIC SLANGLANG RULES:
+- Use bloody...mate strings whenever possible
+- Use keyword terminators like "fair go" and "make tracks" whenever possible
+- Replace traditional variable names with funny suitable Australian terms
+- Use "pass the parcel" instead of "pass the count", "bruce" instead of "x", etc.
+- Prefer conversational, slang-heavy variable names with good humour
+- For arithmetic expressions, use direct binary operators, not method chaining
 
-Your task is to generate valid SlangLang code based on user prompts. Follow these rules:
-1. Use proper SlangLang syntax and keywords from the specification above
-2. Study the examples above to understand real-world usage patterns
-3. Make code readable and follow the language's conversational, Australian slang style
-4. Include comments using "oi" for line comments
-5. Ensure the code is syntactically correct according to the spec
-5. Return ONLY the SlangLang code, no explanations, no markdown formatting, no code blocks
+${this.specContent ? `LANGUAGE SPEC REFERENCE (for edge cases):\n${this.specContent.substring(0, 1000)}...\n` : ''}
+
+Your task: Generate valid SlangLang code based on user prompts. Return ONLY the SlangLang code, no explanations, no markdown formatting, no code blocks.
 
 Generate SlangLang code for the following request: ${prompt}`;
 

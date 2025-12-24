@@ -136,8 +136,7 @@ oi oi oi
 | `oi`            | Line comment start             |
 | `aussie aussie aussie` | Block comment open      |
 | `oi oi oi`      | Block comment close            |
-| `prep`          | Function definition keyword (legacy) |
-| `on`            | Function definition (new syntax) |
+| `on`            | Function definition start      |
 | `barbie`        | Function body start marker     |
 | `with`          | Parameter list start           |
 | `and`           | Parameter/argument separator   |
@@ -515,19 +514,6 @@ calculate on the barbie with
 ```
 
 The `fair go.` terminator is **optional** when indentation is clear.
-
-### Function Definition (Legacy Syntax)
-
-The original `prep ... barbie` syntax is still supported:
-
-```slang
-prep greet barbie
-  Crikey! "gday"
-  serve yeah
-
-prep add barbie with a and b
-  serve a plus b
-```
 
 ### Function Calls
 
