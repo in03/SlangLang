@@ -216,6 +216,55 @@ function compile(ast, level = 0) {
   });
 }
 
+// Check if this is the known harmless 'is not' ambiguity pattern
+function isIsNotAmbiguity(ast1, ast2) {
+  // Helper to find comparison expressions in the AST
+  function findComparisonExpr(node) {
+    if (!node) return null;
+    if (Array.isArray(node)) {
+      for (const item of node) {
+        const result = findComparisonExpr(item);
+        if (result) return result;
+      }
+    } else if (node.type === 'BinOp' && (node.op === '===' || node.op === '!==')) {
+      return node;
+    } else if (node.expr) {
+      return findComparisonExpr(node.expr);
+    } else if (node.body) {
+      return findComparisonExpr(node.body);
+    }
+    return null;
+  }
+
+  const comp1 = findComparisonExpr(ast1);
+  const comp2 = findComparisonExpr(ast2);
+
+  if (!comp1 || !comp2) return false;
+
+  // Check if one is !== and the other is === with a NOT unary operation
+  const isNotEquality = comp1.op === '!==' && comp2.op === '===';
+  const isEqualityNot = comp1.op === '===' && comp2.op === '!==';
+
+  if (!isNotEquality && !isEqualityNot) return false;
+
+  // Check if the === version has a NOT unary operation
+  const equalityAst = isNotEquality ? comp2 : comp1;
+
+  function hasNotUnary(node) {
+    if (!node) return false;
+    if (node.type === 'UnaryOp' && node.op === '!') return true;
+
+    // Check all child nodes
+    if (node.left && hasNotUnary(node.left)) return true;
+    if (node.right && hasNotUnary(node.right)) return true;
+    if (node.expr && hasNotUnary(node.expr)) return true;
+
+    return false;
+  }
+
+  return hasNotUnary(equalityAst);
+}
+
 function transpile(source) {
   const parser = new nearley.Parser(
     nearley.Grammar.fromCompiled(grammar)
@@ -227,7 +276,13 @@ function transpile(source) {
   }
   
   if (parser.results.length > 1) {
-    console.warn("Warning: Ambiguous parse, using first result");
+    // Check if this is the known harmless 'is not' ambiguity
+    const isHarmlessIsNotAmbiguity = parser.results.length === 2 &&
+      isIsNotAmbiguity(parser.results[0], parser.results[1]);
+
+    if (!isHarmlessIsNotAmbiguity) {
+      console.warn("Warning: Ambiguous parse, using first result");
+    }
   }
   
   const ast = parser.results[0];

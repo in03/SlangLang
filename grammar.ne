@@ -122,10 +122,11 @@ expr -> compareexpr {% id %}
 compareexpr -> addexpr {% id %}
             | addexpr %KW_TOPS addexpr {% d => ({ type: "BinOp", op: ">", left: d[0], right: d[2] }) %}
             | addexpr %KW_COPS addexpr {% d => ({ type: "BinOp", op: "<", left: d[0], right: d[2] }) %}
-            | addexpr %KW_EQUALS addexpr {% d => ({ type: "BinOp", op: "===", left: d[0], right: d[2] }) %}
-            | addexpr %KW_NOT %KW_EQUALS addexpr {% d => ({ type: "BinOp", op: "!==", left: d[0], right: d[3] }) %}
-            | addexpr %KW_ISNT addexpr {% d => ({ type: "BinOp", op: "!==", left: d[0], right: d[2] }) %}
+            # Compound inequality operator (must come before simple 'is')
             | addexpr %KW_IS %KW_NOT addexpr {% d => ({ type: "BinOp", op: "!==", left: d[0], right: d[3] }) %}
+            | addexpr %KW_NOT %KW_EQUALS addexpr {% d => ({ type: "BinOp", op: "!==", left: d[0], right: d[3] }) %}
+            # Simple equality operators
+            | addexpr %KW_EQUALS addexpr {% d => ({ type: "BinOp", op: "===", left: d[0], right: d[2] }) %}
             | addexpr %KW_IS addexpr {% d => ({ type: "BinOp", op: "===", left: d[0], right: d[2] }) %}
 
 addexpr -> mulexpr {% id %}
