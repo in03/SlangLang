@@ -362,12 +362,54 @@
             filter: brightness(0.9);
         }
         
+        /* Editor wrapper */
+        .editor-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        @media (max-width: 800px) {
+            .editor-wrapper {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .editor-wrapper {
+                height: 250px;
+            }
+        }
+
         /* CodeMirror - raw terminal vibes */
         .CodeMirror {
-            height: 400px;
+            height: 100%;
             font-family: 'IBM Plex Mono', monospace;
             font-size: 13px;
             border: none;
+        }
+
+        @media (max-width: 800px) {
+            .CodeMirror {
+                height: 300px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .CodeMirror {
+                height: 250px;
+                font-size: 11px;
+            }
+        }
+
+        /* Ensure proper line wrapping behavior */
+        .CodeMirror-wrap pre {
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .CodeMirror-line {
+            min-height: 1em;
         }
         
         .CodeMirror-gutters {
@@ -780,6 +822,24 @@
             display: flex;
             gap: 0.5rem;
             margin-bottom: 0.5rem;
+        }
+
+        .generate-btn {
+            min-width: 80px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 600px) {
+            .ai-input-group {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .generate-btn {
+                align-self: stretch;
+                min-width: unset;
+            }
         }
 
         .ai-prompt-input {
@@ -1285,6 +1345,8 @@ make tracks.`
                 indentWithTabs: false,
                 styleActiveLine: true,
                 theme: cmTheme,
+                viewportMargin: Infinity, // Ensure all lines are rendered
+                electricChars: false, // Disable auto-indentation that might interfere
             });
             
             // Load default preset

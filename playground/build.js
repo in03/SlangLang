@@ -21,7 +21,7 @@ function loadKeywords() {
   
   if (!existsSync(keywordsPath)) {
     console.log('⚠️  keywords.json not found, running generate-syntax.js...');
-    execSync('bun tools/generate-syntax.js', { stdio: 'inherit' });
+    execSync('bun ../tools/generate-syntax.js', { stdio: 'inherit' });
   }
   
   const data = JSON.parse(readFileSync(keywordsPath, 'utf8'));
