@@ -75,15 +75,15 @@ function indent(code, spaces = 2) {
   return code.split("\n").map(line => " ".repeat(spaces) + line).join("\n");
 }
 
-function compile(ast, level = 0) {
+function compile(ast, level = 0, target = 'commonjs') {
   return ast.map(node => {
     switch (node.type) {
       case "Print":
         return `console.log(${genExpr(node.expr)});`;
-      
+
       case "Function": {
         const params = node.params.join(", ");
-        const body = compile(node.body).join("\n");
+        const body = compile(node.body, level + 1, target).join("\n");
         return `function ${node.name}(${params}) {\n${indent(body)}\n}`;
       }
       
@@ -151,47 +151,62 @@ function compile(ast, level = 0) {
           : `${node.target}.pop();`;
       
       case "ForEach": {
-        const body = compile(node.body).join("\n");
+        const body = compile(node.body, level + 1, target).join("\n");
         return `for (const ${node.iterator} of ${node.target}) {\n${indent(body)}\n}`;
       }
-      
+
       case "ForEachDict": {
-        const body = compile(node.body).join("\n");
+        const body = compile(node.body, level + 1, target).join("\n");
         const keyVar = node.keyVar || "item";
         const valVar = node.valVar || "price";
         return `for (const [${keyVar}, ${valVar}] of Object.entries(${node.target})) {\n${indent(body)}\n}`;
       }
-      
+
       case "ForRange": {
-        const body = compile(node.body).join("\n");
+        const body = compile(node.body, level + 1, target).join("\n");
         return `for (let ${node.iterator} = 0; ${node.iterator} < ${genExpr(node.count)}; ${node.iterator}++) {\n${indent(body)}\n}`;
       }
-      
+
       case "WhileNot": {
-        const body = compile(node.body).join("\n");
+        const body = compile(node.body, level + 1, target).join("\n");
         return `while (!(${genExpr(node.condition)})) {\n${indent(body)}\n}`;
       }
-      
+
       case "If": {
-        let code = `if (${genExpr(node.condition)}) {\n${indent(compile(node.body).join("\n"))}\n}`;
+        let code = `if (${genExpr(node.condition)}) {\n${indent(compile(node.body, level + 1, target).join("\n"))}\n}`;
         for (const elif of node.elifs) {
-          code += ` else if (${genExpr(elif.condition)}) {\n${indent(compile(elif.body).join("\n"))}\n}`;
+          code += ` else if (${genExpr(elif.condition)}) {\n${indent(compile(elif.body, level + 1, target).join("\n"))}\n}`;
         }
         if (node.else) {
-          code += ` else {\n${indent(compile(node.else).join("\n"))}\n}`;
+          code += ` else {\n${indent(compile(node.else, level + 1, target).join("\n"))}\n}`;
         }
         return code;
       }
       
       case "Import":
         // For Node/Bun: const { name } = require("from")
-        return `const { ${node.name} } = require("${node.from}");`;
-      
+        // For ES modules: import { name } from "from"
+        if (target === 'esmodule') {
+          return `import { ${node.name} } from "${node.from}";`;
+        } else {
+          return `const { ${node.name} } = require("${node.from}");`;
+        }
+
       case "ImportAll":
-        return `const __${node.from}__ = require("${node.from}");`;
-      
+        // For wildcard imports, use a more readable name
+        const varName = `${node.from}module`;
+        if (target === 'esmodule') {
+          return `import * as ${varName} from "${node.from}";`;
+        } else {
+          return `const ${varName} = require("${node.from}");`;
+        }
+
       case "ImportModule":
-        return `const ${node.alias} = require("${node.name}");`;
+        if (target === 'esmodule') {
+          return `import ${node.name} from "${node.name}";\nconst ${node.alias} = ${node.name};`;
+        } else {
+          return `const ${node.alias} = require("${node.name}");`;
+        }
       
       case "Throw":
         return `throw new Error(${genExpr(node.message)});`;
@@ -265,16 +280,16 @@ function isIsNotAmbiguity(ast1, ast2) {
   return hasNotUnary(equalityAst);
 }
 
-function transpile(source) {
+function transpile(source, target = 'commonjs') {
   const parser = new nearley.Parser(
     nearley.Grammar.fromCompiled(grammar)
   );
   parser.feed(source);
-  
+
   if (!parser.results || parser.results.length === 0) {
     throw new Error("Parse failed: no results");
   }
-  
+
   if (parser.results.length > 1) {
     // Check if this is the known harmless 'is not' ambiguity
     const isHarmlessIsNotAmbiguity = parser.results.length === 2 &&
@@ -284,9 +299,9 @@ function transpile(source) {
       console.warn("Warning: Ambiguous parse, using first result");
     }
   }
-  
+
   const ast = parser.results[0];
-  const code = compile(ast).join("\n");
+  const code = compile(ast, 0, target).join("\n");
   
   // Wrap in async IIFE if we have any async operations (like gimme/input)
   if (code.includes("await")) {

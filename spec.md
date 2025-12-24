@@ -795,34 +795,65 @@ make tracks.
 
 ## 11. Imports
 
+SlangLang supports importing both CommonJS and ES modules. The compiler generates appropriate syntax based on the target environment.
+
 ### Named Import
 
 ```slang
 chuck in sqrt from math.
 ```
 
-Compiles to:
-
+**CommonJS (default):**
 ```js
 const { sqrt } = require("math");
+```
+
+**ES Modules (when target='esmodule'):**
+```js
+import { sqrt } from "math";
 ```
 
 ### Wildcard Import
 
 ```slang
-chuck in the lot from time.
+chuck in the lot from fs.
+```
+
+**CommonJS (default):**
+```js
+const fsmodule = require("fs");
+```
+
+**ES Modules (when target='esmodule'):**
+```js
+import * as fsmodule from "fs";
 ```
 
 ### Module Import with Alias
 
 ```slang
-chuck in numpy – mates call it numbers.
+chuck in path – mates call it pathlib.
 ```
 
-Compiles to:
-
+**CommonJS (default):**
 ```js
-const numbers = require("numpy");
+const pathlib = require("path");
+```
+
+**ES Modules (when target='esmodule'):**
+```js
+import path from "path";
+const pathlib = path;
+```
+
+### Accessing Module Properties
+
+Use `grab` to access properties and methods from imported modules:
+
+```slang
+chuck in the lot from fs.
+exists_sync_func is grab existsSync from fsmodule.
+result is howbout exists_sync_func with "file.txt".
 ```
 
 ---
